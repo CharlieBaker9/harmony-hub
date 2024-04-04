@@ -8,6 +8,7 @@ import {
   Route,
   Link,
   useNavigate,
+  useRef,
 } from 'react-router-dom';
 
 const initialOptions = ["I", "I6", "V", "V6", "V65", "V42", "V73", "V7", "vii°6"];
@@ -94,11 +95,6 @@ function Home() {
     }
   };
 
-  const handleFourthDropdownChange = (event) => {
-    const selectedChord = event.target.value;
-    setFourthChord(selectedChord);
-  };
-
   const isComputeDisabled = !firstChord || !secondChord || !thirdChord || !fourthChord;
 
   const compute = () => {
@@ -111,38 +107,7 @@ function Home() {
     <div className="App">
       <header className="App-header">
         <h1>Harmony Hub</h1>
-        {/* Dropdown for selecting the first chord */}
-        <Dropdown 
-          options={initialOptions} 
-          onChange={handleFirstDropdownChange} 
-          disabled={false}
-          value={firstChord}
-        />
-        {/* Conditional rendering for subsequent Dropdowns based on the previous selection */}
-        {isSecondDropdownDisabled ? null : (
-          <Dropdown 
-            options={secondChordOptions} 
-            onChange={handleSecondDropdownChange} 
-            disabled={isSecondDropdownDisabled}
-            value={secondChord}
-          />
-        )}
-        {isThirdDropdownDisabled ? null : (
-          <Dropdown 
-            options={thirdChordOptions} 
-            onChange={handleThirdDropdownChange} 
-            disabled={isThirdDropdownDisabled}
-            value={thirdChord}
-          />
-        )}
-        {isFourthDropdownDisabled ? null : (
-          <Dropdown 
-            options={fourthChordOptions} 
-            onChange={handleFourthDropdownChange} 
-            disabled={isFourthDropdownDisabled}
-            value={fourthChord}
-          />
-        )}
+        {/* Your Dropdown components here */}
         <button onClick={compute} disabled={isComputeDisabled}>Compute</button>
       </header>
     </div>
