@@ -4,8 +4,6 @@ var dict = {
   "I6 V": {5: 5, 1: [2,7]}
 };
 
-var progression = ["V", "I", "I6", "V", "I", "I6", "V", "I", "I6", "V"];
-
 function printParts(progression, dict) {
   let P1 = []
   let P2 = []
@@ -62,5 +60,7 @@ function printParts(progression, dict) {
   console.log(P2)
   console.log(P3)
 }
+
+var progression = ["V", "I", "I6", "V", "I", "I6", "V", "I", "I6", "V"];
 
 printParts(progression, dict);

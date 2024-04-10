@@ -1,6 +1,7 @@
 // src/App.js
 import React, { useState } from 'react';
 import './App.css';
+import { obtainBassNotes } from './voiceLeadingFunctions/bassNotes';
 import Dropdown from './Dropdown';
 import {
   BrowserRouter as Router,
@@ -12,15 +13,18 @@ import {
 const initialOptions = ["I", "I6", "V", "V6", "V65", "V42", "V73", "V7", "vii°6"];
 
 const nextChordOptions = {
-  "I": ["I6", "V", "V6", "vii°6", "V43"],
-  "I6": ["I", "V", "vii°6", "V43"],
+  "I": ["I6", "V", "V6", "vii°6", "V43", "V65", "V73", "V7"],
+  "I6": ["I", "V", "vii°6", "V43", "V42"],
+  "I83": ["V7"],
   "V": ["I", "I6"],
   "V6": ["I"],
-  "V65": ["I"],
-  "V42": ["I6"],
-  "V73": ["I"],
-  "V7": ["I", "I83"],
-  "vii°6": ["I", "I6"]
+  "V43": ["I6", "I"],
+  "vii°6": ["I", "I6"],
+
+  "V65": ["I"], //none 
+  "V42": ["I"], //none
+  "V73": ["I"], //none
+  "V7": ["I"], //none
 };
 
 function ComputeScreen() {
@@ -100,7 +104,10 @@ function Home() {
 
   const isComputeDisabled = !firstChord || !secondChord || !thirdChord || !fourthChord;
 
-  const compute = () => {
+  const compute = (firstChord, secondChord, thirdChord, fourthChord) => {
+    const chordSequence = `${firstChord} ${secondChord} ${thirdChord} ${fourthChord}`.trim();
+    const bassNotes = obtainBassNotes(chordSequence);
+    console.log(bassNotes)
     if (!isComputeDisabled) {
       navigate('/compute');
     }

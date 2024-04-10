@@ -81,4 +81,4 @@ const fixedBass2 = shiftBassNotes(tenor2, notesArr);
 console.log(fixedBass)
 console.log(fixedBass2)
 
-
+module.exports = { obtainBassNotes, shiftBassNotes };
