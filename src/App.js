@@ -1,7 +1,8 @@
 // src/App.js
 import React, { useState } from 'react';
 import './App.css';
-import { obtainBassNotes } from './voiceLeadingFunctions/bassNotes';
+import { obtainBassNotes, shiftBassNotes } from './voiceLeadingFunctions/bassNotes.js';
+import { generateSAT } from './voiceLeadingFunctions/generateSAT.js';
 import Dropdown from './Dropdown';
 import {
   BrowserRouter as Router,
@@ -104,11 +105,25 @@ function Home() {
 
   const isComputeDisabled = !firstChord || !secondChord || !thirdChord || !fourthChord;
 
-  const compute = (firstChord, secondChord, thirdChord, fourthChord) => {
-    const chordSequence = `${firstChord} ${secondChord} ${thirdChord} ${fourthChord}`.trim();
-    const bassNotes = obtainBassNotes(chordSequence);
-    console.log(bassNotes)
+  const compute = () => {
+    // Ensure that chord variables are strings. If they're not, this will cast them to strings.
+    const chordSequence = [firstChord, secondChord, thirdChord, fourthChord].join(' ').trim();
+  
     if (!isComputeDisabled) {
+      const bassNotes = obtainBassNotes(chordSequence);
+      const [soprano, alto, tenor] = generateSAT(chordSequence);
+      const bass = shiftBassNotes(tenor, bassNotes); 
+
+      let table = {
+        chord: [firstChord, secondChord, thirdChord, fourthChord],
+        soprano: soprano,
+        alto: alto,
+        tenor: tenor,
+        bass: bass
+      };
+      
+      console.table(table);
+  
       navigate('/compute');
     }
   };
