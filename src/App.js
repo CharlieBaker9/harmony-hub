@@ -111,15 +111,19 @@ function Home() {
   
     if (!isComputeDisabled) {
       const bassNotes = obtainBassNotes(chordSequence);
-      const [soprano, alto, tenor] = generateSAT(chordSequence);
+      const [soprano, alto, tenor, decision, decisionVoices] = generateSAT(chordSequence);
+
       const bass = shiftBassNotes(tenor, bassNotes); 
+      const stringDecisionVoices = decisionVoices.map(JSON.stringify);
 
       let table = {
         chord: [firstChord, secondChord, thirdChord, fourthChord],
         soprano: soprano,
         alto: alto,
         tenor: tenor,
-        bass: bass
+        bass: bass,
+        decisionPoint: decision,
+        decisionVoices: stringDecisionVoices
       };
       
       console.table(table);

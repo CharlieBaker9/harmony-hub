@@ -1,11 +1,11 @@
 const spacingDict = require('../dictionaries/openSpacing.json');
 const progressionDict = require('../dictionaries/progressionDict.json');
 
-function addingNote(nextDict, array, idx) {
-  let nextNote = nextDict[array[0]];
+function addingNote(possPathSets, array, idx) {
+  let nextNote = possPathSets[array[0]];
   if (Array.isArray(nextNote)){
     nextNote = nextNote[idx];
-    idx += 1;
+    idx += 1;   //dumb -- need specific arrangement as it unfolds -- registral scale degrees
   }
   array.unshift(nextNote);
 }
@@ -40,12 +40,12 @@ function generateSAT(progression) {
   let s = [];
   let a = [];
   let t = [];
-  let d = [];
+  let decisionBools = [];
   let decisionVoices = [];
 
-  const progArr = progression.split(' ');
+  const romanNumArray = progression.split(' ');
 
-  let last = spacingDict[progArr[progArr.length-1]];
+  let last = spacingDict[romanNumArray[romanNumArray.length-1]];
   let decision = false;
   let dv = "";
   if (Array.isArray(last[0])) {
@@ -57,32 +57,30 @@ function generateSAT(progression) {
   s.push(last[0]);
   a.push(last[1]);
   t.push(last[2]);
-  d.push(decision);
+  decisionBools.push(decision);
   decisionVoices.push(dv);
 
-  for (let i = progArr.length - 1; i >= 1; i--){
-    let decisionPoint = false;
-    let decisionVoice = "";
-    let key = progArr[i-1] + " " + progArr[i];
-    let nextDict = progressionDict[key];
+  for (let i = romanNumArray.length - 1; i >= 1; i--){
+    let progressionKey = romanNumArray[i] + " " + romanNumArray[i - 1];
+    let possPathSets = progressionDict[progressionKey];
 
-    if (Array.isArray(nextDict)){
-      //decision point
-      decisionVoice = nextDict;
-      nextDict = nextDict[0];
-      decisionPoint = true;
+    let decisionPointBool = false; //make this a one liner
+    if (possPathSets.length > 1){
+      decisionPointBool = true;
     }
 
+    let pathSet = possPathSets[0]; //hack for now
+
     let idx = 0;
-    addingNote(nextDict, s, idx);
-    addingNote(nextDict, a, idx);
-    addingNote(nextDict, t, idx);
-    d.unshift(decisionPoint);
-    decisionVoices.unshift(decisionVoice);
+    addingNote(pathSet, s, idx);
+    addingNote(pathSet, a, idx);
+    addingNote(pathSet, t, idx);
+    decisionBools.unshift(decisionPointBool);
+    decisionVoices.unshift(possPathSets);
   }
 
   let parts = assigningToRegister(s, a, t);
-  parts.push(d, decisionVoices);
+  parts.push(decisionBools, decisionVoices);
 
   return parts;
 }

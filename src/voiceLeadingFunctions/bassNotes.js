@@ -67,14 +67,14 @@ function shiftBassNotes(tenor, bass) {
   return bass;
 }
 
-const progression = 'I I6 V I';
-const notesArr = obtainBassNotes(progression);
+// const progression = 'I I6 V I';
+// const notesArr = obtainBassNotes(progression);
 
-const tenor1 = [-1, 2, 2, 5];
-const tenor2 = [-14, -21, -20, -18];
-const fixedBass = shiftBassNotes(tenor1, notesArr);
-const fixedBass2 = shiftBassNotes(tenor2, notesArr);
-console.log(fixedBass)
-console.log(fixedBass2)
+// const tenor1 = [-1, 2, 2, 5];
+// const tenor2 = [-14, -21, -20, -18];
+// const fixedBass = shiftBassNotes(tenor1, notesArr);
+// const fixedBass2 = shiftBassNotes(tenor2, notesArr);
+// console.log(fixedBass)
+// console.log(fixedBass2)
 
 module.exports = { obtainBassNotes, shiftBassNotes };
