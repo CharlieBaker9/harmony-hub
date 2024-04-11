@@ -47,7 +47,6 @@ function obtainBassNotes(progression) {
       console.log("my difference math was wrong");
     }
   }
-  console.log(state);
   return pitchedBassNotes;
 }
 
@@ -55,16 +54,14 @@ function shiftBassNotes(tenor, bass) {
   let noCrosses = false;
 
   while (!noCrosses) {  
-    let cross = false;
     for (let i = 0; i < tenor.length; i ++){
-      if (tenor[i] <= bass[i]){
-        cross = true;
+      if (tenor[i] < bass[i] || (i > 0 && tenor[i] < bass[i - 1]) || (i < tenor.length - 1 && tenor[i] < bass[i + 1])){
+        bass = bass.map(value => value - 7);
+        break;
       }
-    }
-    if (cross){
-      bass = bass.map(value => value - 7);
-    } else {
-      noCrosses = true;
+      if (i === tenor.length - 1){
+        noCrosses = true;
+      }
     }
   }
   return bass;
@@ -72,10 +69,9 @@ function shiftBassNotes(tenor, bass) {
 
 const progression = 'I I6 V I';
 const notesArr = obtainBassNotes(progression);
-console.log(notesArr);
 
 const tenor1 = [-1, 2, 2, 5];
-const tenor2 = [-14, -19, -20, -18];
+const tenor2 = [-14, -21, -20, -18];
 const fixedBass = shiftBassNotes(tenor1, notesArr);
 const fixedBass2 = shiftBassNotes(tenor2, notesArr);
 console.log(fixedBass)
