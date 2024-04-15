@@ -8,30 +8,36 @@ function addingNote(possPathSets, array, idx) {
     idx += 1;   //dumb -- need specific arrangement as it unfolds -- registral scale degrees
   }
   array.unshift(nextNote);
+
+  return idx
+}
+
+function adjustNote(noteIn, noteOut) {
+  return (((noteIn - noteOut + 3) % 7) + 3)
 }
 
 function assigningToRegister(s, a, t) {
-  let soprano = s.map(function(number) { return number + 7;});
-  let tenor = t.map(function(number) { return number - 7;});
-  
-  //shifting alto
+  // shifting soprano
+  let soprano = [s[s.length-1]];
+  for (let i = s.length - 2; i >= 0; i--){
+    let temp = adjustNote(s[i], soprano[0]);
+    soprano.unshift(temp);
+  }
+
+  // shifting alto
   let alto = [a[a.length-1]];
   for (let i = a.length - 2; i >= 0; i--){
-    let temp = a[i];
-    if (a[i] - alto[0] > 3){
-      temp -= 7;
-    }
+    let temp = adjustNote(a[i], alto[0]);
     alto.unshift(temp);
   }
 
-  for (let i = 0; i < alto.length; i++){
-    if (soprano[i] >= alto[i] + 8){ //do we want this to be + 7 allow for unisons?
-      soprano[i] -= 7;
-    }
-    if (tenor[i] <= a[i] - 8){ //do we want this to be - 7 allow for unisons?
-      tenor[i] += 7;
-    }
+  // shifting tenor
+  let tenor = [t[t.length-1]];
+  for (let i = t.length - 2; i >= 0; i--){
+    let temp = adjustNote(t[i], tenor[0]);
+    tenor.unshift(temp);
   }
+
 
   return [soprano, alto, tenor];
 }
@@ -72,9 +78,9 @@ function generateSAT(progression) {
     let pathSet = possPathSets[0]; //hack for now
 
     let idx = 0;
-    addingNote(pathSet, s, idx);
-    addingNote(pathSet, a, idx);
-    addingNote(pathSet, t, idx);
+    idx = addingNote(pathSet, s, idx);
+    idx = addingNote(pathSet, a, idx);
+    idx = addingNote(pathSet, t, idx);
     decisionBools.unshift(decisionPointBool);
     decisionVoices.unshift(possPathSets);
   }
@@ -84,6 +90,7 @@ function generateSAT(progression) {
 
   return parts;
 }
+
 // const progression = 'I I6 V I';
 // const notesArr = generateSAT(progression);
 // console.log(notesArr)
