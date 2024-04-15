@@ -13,7 +13,11 @@ function addingNote(possPathSets, array, idx) {
 }
 
 function adjustNote(noteIn, noteOut) {
-  return (((noteIn - noteOut + 3) % 7) - 3)
+  let temp = ((noteIn - noteOut + 3) % 7);
+  if (temp < 0) { temp += 7 }
+  return (temp - 3)
+
+  // return (((noteIn - noteOut + 3) % 7) - 3)
 }
 
 function assigningToRegister(s, a, t) {
