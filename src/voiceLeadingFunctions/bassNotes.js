@@ -15,20 +15,20 @@ function obtainBassNotes(progression) {
 
   pitchedBassNotes.push(endingNote[noteArr.slice(-1)])
   for (let i = noteArr.length-2; i >= 0; i--){
-    let diff = noteArr[i+1] - noteArr[i];
+    let diff = noteArr[i] - noteArr[i+1];
 
     if (diff <= 2 && diff >= -2){            // shifting by 2nd's, 3rd's, or repeating note
       let newNote = pitchedBassNotes[0] + diff;
       pitchedBassNotes.unshift(newNote);
       state += diff;
     } else if ([6, -6].includes(diff)){      // dealing with 7ths and shifting to movements by 2nd's
-      let newNote = pitchedBassNotes[0] + diff/6;
+      let newNote = pitchedBassNotes[0] - diff/6;
       pitchedBassNotes.unshift(newNote);
-      state += diff/6;
+      state -= diff/6;
     } else if ([5, -5].includes(diff)){      // dealing with 6ths and shifting to movements by 3rd's
-      let newNote = pitchedBassNotes[0] + diff*(2/5);
+      let newNote = pitchedBassNotes[0] - diff*(2/5);
       pitchedBassNotes.unshift(newNote);
-      state += diff*(2/5);
+      state -= diff*(2/5);
     } else if ([-4, -3, 3, 4].includes(diff)){
       if ((state > 0 && diff < 0) || (state < 0 && diff > 0)){ // simple condition where not is self correcting back to optimal state
         let newNote = pitchedBassNotes[0] + diff;
@@ -64,6 +64,7 @@ function shiftBassNotes(tenor, bass) {
       }
     }
   }
+
   return bass;
 }
 

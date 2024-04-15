@@ -13,28 +13,28 @@ function addingNote(possPathSets, array, idx) {
 }
 
 function adjustNote(noteIn, noteOut) {
-  return (((noteIn - noteOut + 3) % 7) + 3)
+  return (((noteIn - noteOut + 3) % 7) - 3)
 }
 
 function assigningToRegister(s, a, t) {
   // shifting soprano
-  let soprano = [s[s.length-1]];
+  let soprano = [s[s.length-1] + 7];
   for (let i = s.length - 2; i >= 0; i--){
-    let temp = adjustNote(s[i], soprano[0]);
+    let temp = soprano[0] + adjustNote(s[i], s[i+1]);
     soprano.unshift(temp);
   }
 
   // shifting alto
   let alto = [a[a.length-1]];
   for (let i = a.length - 2; i >= 0; i--){
-    let temp = adjustNote(a[i], alto[0]);
+    let temp = alto[0] + adjustNote(a[i], a[i+1]);
     alto.unshift(temp);
   }
 
   // shifting tenor
-  let tenor = [t[t.length-1]];
+  let tenor = [t[t.length-1] - 7];
   for (let i = t.length - 2; i >= 0; i--){
-    let temp = adjustNote(t[i], tenor[0]);
+    let temp = tenor[0] + adjustNote(t[i], t[i+1]);
     tenor.unshift(temp);
   }
 
