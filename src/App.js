@@ -1,8 +1,9 @@
 // src/App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import { obtainBassNotes, shiftBassNotes } from './voiceLeadingFunctions/bassNotes.js';
 import { generateSAT } from './voiceLeadingFunctions/generateSAT.js';
+import helloworldXml from './xml/helloWorld.xml';
 import Dropdown from './Dropdown';
 import {
   BrowserRouter as Router,
@@ -29,7 +30,54 @@ const nextChordOptions = {
 };
 
 function ComputeScreen() {
-  return <div>Computed</div>;
+  const osmdContainerRef = useRef(null);
+
+  useEffect(() => {
+    // Function to load and initialize OSMD
+    const loadAndRenderOSMD = async () => {
+      if (!window.OpenSheetMusicDisplay) {
+        const script = document.createElement('script');
+        script.src = "https://unpkg.com/opensheetmusicdisplay@0.8.3/build/opensheetmusicdisplay.min.js";
+        document.body.appendChild(script);
+
+        script.onload = () => {
+          renderOSMD();
+        };
+        script.onerror = () => console.error("Script failed to load");
+      } else {
+        renderOSMD();
+      }
+    };
+
+    // Function to render OSMD
+    const renderOSMD = () => {
+      if (osmdContainerRef.current) {
+        const osmd = new window.opensheetmusicdisplay.OpenSheetMusicDisplay(osmdContainerRef.current, {
+          autoResize: true,
+          backend: "svg",
+          drawTitle: true,
+        });
+
+        fetch(helloworldXml)
+          .then(response => response.text())
+          .then(xml => osmd.load(xml))
+          .then(() => {
+            osmd.render();
+          })
+          .catch(error => console.error("Error loading or rendering the score", error));
+      }
+    };
+
+    loadAndRenderOSMD();
+
+    // Cleanup function
+    return () => {
+      const scripts = document.querySelectorAll('script[src="https://unpkg.com/opensheetmusicdisplay@0.8.3/build/opensheetmusicdisplay.min.js"]');
+      scripts.forEach(script => document.body.removeChild(script));
+    };
+  }, []);
+
+  return <div ref={osmdContainerRef} style={{ width: '100%', height: '100%' }} />;
 }
 
 function Home() {
