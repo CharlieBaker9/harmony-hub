@@ -103,11 +103,13 @@ function generateSAT(progression) {
   let t = [];
   let decisionBools = [];
   let decisionVoices = [];
-  let methodsDecisions = Array(progression.length-1).fill(0);
-  let doublingDecisions = [false, true, true]
+  console.log(progression);
   // let doublingDecisions = Array(progression.length-1).fill(true);
 
   const romanNumArray = progression.split(' ');
+  let methodsDecisions = Array(romanNumArray.length-1).fill(0);
+  let doublingDecisions = [true, true, true]
+  methodsDecisions[0] = 1;
 
   let last = spacingDict[romanNumArray[romanNumArray.length-1]];
   let decision = false;
@@ -153,17 +155,17 @@ function generateSAT(progression) {
   }
 
   let parts = assigningToRegister(s, a, t);
-  parts.push(decisionBools, decisionVoices, methodsDecisions, doublingDecisions);
+  parts.push(methodsDecisions, doublingDecisions);
 
   return parts;
 }
 
 // const progression = 'IV V I I6 V I';
-const progression2 = "I I6 I I6";
-const notesArr = generateSAT(progression2);
+// const progression2 = "I I6 I I6";
+// const notesArr = generateSAT(progression2);
 
-console.log(notesArr[0]);
-console.log(notesArr[1]);
-console.log(notesArr[2]);
+// console.log(notesArr[0]);
+// console.log(notesArr[1]);
+// console.log(notesArr[2]);
 
 module.exports = { generateSAT };

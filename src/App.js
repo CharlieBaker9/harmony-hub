@@ -1,9 +1,10 @@
 // src/App.js
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import './App.css';
 import { obtainBassNotes, shiftBassNotes } from './voiceLeadingFunctions/bassNotes.js';
 import { generateSAT } from './voiceLeadingFunctions/generateSAT.js';
-import helloworldXml from './xml/helloWorld.xml';
+import { convertToXML } from './xml/xmlComputation.js';
 import Dropdown from './Dropdown';
 import {
   BrowserRouter as Router,
@@ -31,9 +32,11 @@ const nextChordOptions = {
 
 function ComputeScreen() {
   const osmdContainerRef = useRef(null);
+  const osmdInstanceRef = useRef(null);
+  const location = useLocation();
+  const { notesXml } = location.state || {}; // Extract notesXml from state
 
   useEffect(() => {
-    // Function to load and initialize OSMD
     const loadAndRenderOSMD = async () => {
       if (!window.OpenSheetMusicDisplay) {
         const script = document.createElement('script');
@@ -49,33 +52,31 @@ function ComputeScreen() {
       }
     };
 
-    // Function to render OSMD
     const renderOSMD = () => {
-      if (osmdContainerRef.current) {
-        const osmd = new window.opensheetmusicdisplay.OpenSheetMusicDisplay(osmdContainerRef.current, {
+      if (osmdContainerRef.current && !osmdInstanceRef.current) {
+        osmdInstanceRef.current = new window.opensheetmusicdisplay.OpenSheetMusicDisplay(osmdContainerRef.current, {
           autoResize: true,
           backend: "svg",
           drawTitle: true,
         });
 
-        fetch(helloworldXml)
-          .then(response => response.text())
-          .then(xml => osmd.load(xml))
-          .then(() => {
-            osmd.render();
-          })
-          .catch(error => console.error("Error loading or rendering the score", error));
+        if (notesXml) {
+          osmdInstanceRef.current.load(notesXml)
+            .then(() => {
+              osmdInstanceRef.current.render();
+            })
+            .catch(error => console.error("Error loading or rendering the score", error));
+        }
       }
     };
 
     loadAndRenderOSMD();
 
-    // Cleanup function
     return () => {
       const scripts = document.querySelectorAll('script[src="https://unpkg.com/opensheetmusicdisplay@0.8.3/build/opensheetmusicdisplay.min.js"]');
       scripts.forEach(script => document.body.removeChild(script));
     };
-  }, []);
+  }, [notesXml]);
 
   return <div ref={osmdContainerRef} style={{ width: '100%', height: '100%' }} />;
 }
@@ -159,10 +160,17 @@ function Home() {
   
     if (!isComputeDisabled) {
       const bassNotes = obtainBassNotes(chordSequence);
-      const [soprano, alto, tenor, decision, decisionVoices] = generateSAT(chordSequence);
+      const [soprano, alto, tenor, methodDecisions, doublingDecisions] = generateSAT(chordSequence);
 
       const bass = shiftBassNotes(tenor, bassNotes); 
-      const stringDecisionVoices = decisionVoices.map(JSON.stringify);
+      const stringDoublingDecisions = doublingDecisions.map(JSON.stringify);
+
+      let formattedNotes = []
+      for (let i = 0; i < soprano.length; i++) {
+        formattedNotes.push([soprano[i], alto[i], tenor[i], bass[i]])
+      }
+
+      const notesXml = convertToXML(formattedNotes);
 
       let table = {
         chord: [firstChord, secondChord, thirdChord, fourthChord],
@@ -170,13 +178,13 @@ function Home() {
         alto: alto,
         tenor: tenor,
         bass: bass,
-        decisionPoint: decision,
-        decisionVoices: stringDecisionVoices
+        methodDecisions: methodDecisions,
+        doublingDecisions: stringDoublingDecisions
       };
       
       console.table(table);
   
-      navigate('/compute');
+      navigate('/compute', { state: { notesXml } });
     }
   };
 
