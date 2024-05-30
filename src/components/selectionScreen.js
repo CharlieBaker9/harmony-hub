@@ -1,4 +1,4 @@
-// src/SelectionScreen.js
+// src/components/selectionScreen.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { obtainBassNotes, shiftBassNotes } from '../voiceLeadingFunctions/bassNotes.js';
@@ -102,7 +102,13 @@ function SelectionScreen() {
   
     if (!isComputeDisabled) {
       const bassNotes = obtainBassNotes(chordSequence);
-      const [soprano, alto, tenor, methodDecisions, doublingDecisions] = generateSAT(chordSequence);
+
+      const progression = chordSequence.split(' ');
+      let methodDecisions = Array(progression.length-1).fill(0);
+      let doublingDecisions = [true, true, true]
+
+      const [soprano, alto, tenor, correctDoublingDecisions] = generateSAT(progression, methodDecisions, doublingDecisions);
+      doublingDecisions = correctDoublingDecisions
 
       const bass = shiftBassNotes(tenor, bassNotes); 
       const stringDoublingDecisions = doublingDecisions.map(JSON.stringify);
@@ -126,7 +132,7 @@ function SelectionScreen() {
       
       console.table(table);
   
-      navigate('/compute', { state: { notesXml } });
+      navigate('/compute', { state: { notesXml, table} });
     }
   };
 

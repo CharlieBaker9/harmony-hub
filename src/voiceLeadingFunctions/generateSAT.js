@@ -46,7 +46,7 @@ function assigningToRegister(s, a, t) {
   }
 
   // shifting tenor
-  let tenor = [t[t.length-1] - 7];
+  let tenor = [t[t.length-1]];
   for (let i = t.length - 2; i >= 0; i--){
     let temp = tenor[0] + adjustNote(t[i], t[i+1]);
     tenor.unshift(temp);
@@ -55,18 +55,14 @@ function assigningToRegister(s, a, t) {
   return [soprano, alto, tenor];
 }
 
-function generateSAT(progression) {
+function generateSAT(progression, methodDecisions, doublingDecisions) {
   let s = [];
   let a = [];
   let t = [];
   let decisionBools = [];
   let decisionVoices = [];
 
-  const romanNumArray = progression.split(' ');
-  let methodsDecisions = Array(romanNumArray.length-1).fill(0);
-  let doublingDecisions = [true, true, true]
-
-  let last = spacingDict[romanNumArray[romanNumArray.length-1]];
+  let last = spacingDict[progression[progression.length-1]];
   let decision = false;
   let dv = "";
   if (Array.isArray(last[0])) {
@@ -81,21 +77,22 @@ function generateSAT(progression) {
   decisionBools.push(decision);
   decisionVoices.push(dv);
 
-  for (let i = romanNumArray.length - 1; i >= 1; i--){
-    let progressionKey = romanNumArray[i] + " " + romanNumArray[i - 1];
+  for (let i = progression.length - 1; i >= 1; i--){
+    let progressionKey = progression[i] + " " + progression[i - 1];
     let path = progressionDict[progressionKey];
 
     let methodForkBool = path.length > 1;
-    let method = path[methodsDecisions[i-1]]; 
+    console.log("method stuff", methodDecisions, i-1);
+    let method = path[methodDecisions[i-1]]; 
 
     addingNote(method, [s, a, t], doublingDecisions);
 
     decisionBools.unshift(methodForkBool);
     decisionVoices.unshift(path);
   }
-
   let parts = assigningToRegister(s, a, t);
-  parts.push(methodsDecisions, doublingDecisions);
+  parts.push(methodDecisions, doublingDecisions);
+
 
   return parts;
 }

@@ -1,12 +1,13 @@
-// src/ComputeScreen.js
+// src/components/computeScreen.js
 import React, { useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import DecisionButton from './decisionButton';
 
 function ComputeScreen() {
   const osmdContainerRef = useRef(null);
   const osmdInstanceRef = useRef(null);
   const location = useLocation();
-  const { notesXml } = location.state || {}; // Extract notesXml from state
+  const { notesXml, table } = location.state || {};
 
   useEffect(() => {
     const loadAndRenderOSMD = async () => {
@@ -50,7 +51,17 @@ function ComputeScreen() {
     };
   }, [notesXml]);
 
-  return <div ref={osmdContainerRef} style={{ width: '100%', height: '100%' }} />;
+  return (
+    <div>
+      <div ref={osmdContainerRef} style={{ width: '100%', height: '100%' }} />
+      {table && (
+        <div>
+          <DecisionButton label="Method Decisions" text={JSON.stringify(table.methodDecisions, null, 2)} />
+          <DecisionButton label="Doubling Decisions" text={JSON.stringify(table.doublingDecisions, null, 2)} />
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default ComputeScreen;
