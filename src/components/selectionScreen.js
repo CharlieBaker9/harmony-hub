@@ -104,14 +104,16 @@ function SelectionScreen() {
       const bassNotes = obtainBassNotes(chordSequence);
 
       const progression = chordSequence.split(' ');
-      let methodDecisions = Array(progression.length-1).fill(0);
-      let doublingDecisions = [true, true, true]
+      let soprano, alto, tenor;
+      let methodDecisions = Array(progression.length).fill(0);
+      let methodOpportunities = Array(progression.length).fill(false);
+      let doublingDecisions = Array(progression.length-1).fill(false);
+      let doublingOpportunities = Array(progression.length-1).fill(false);
 
-      const [soprano, alto, tenor, correctDoublingDecisions] = generateSAT(progression, methodDecisions, doublingDecisions);
-      doublingDecisions = correctDoublingDecisions
 
-      const bass = shiftBassNotes(tenor, bassNotes); 
-      const stringDoublingDecisions = doublingDecisions.map(JSON.stringify);
+      [soprano, alto, tenor, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities] = generateSAT(progression, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities);
+
+      const bass = shiftBassNotes(tenor, bassNotes);
 
       let formattedNotes = []
       for (let i = 0; i < soprano.length; i++) {
@@ -127,7 +129,9 @@ function SelectionScreen() {
         tenor: tenor,
         bass: bass,
         methodDecisions: methodDecisions,
-        doublingDecisions: stringDoublingDecisions
+        methodOpportunities: methodOpportunities,
+        doublingDecisions: doublingDecisions,
+        doublingOpportunities: doublingOpportunities
       };
       
       console.table(table);

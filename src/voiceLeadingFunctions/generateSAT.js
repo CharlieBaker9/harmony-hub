@@ -2,7 +2,7 @@ import doublingChoice from './doublingChoice.js';
 const spacingDict = require('../dictionaries/openSpacing.json');
 const progressionDict = require('../dictionaries/progressionDict.json');
 
-function addingNote(method, satArray, doublingDecisions) {
+function addingNote(method, satArray, doublingDecisions, doublingOpportunities, idx) {
   let returningToSameScaleDegree = false;
   for (let i = 0; i < 3; i++){
     let currNote = satArray[i][0];
@@ -25,6 +25,7 @@ function addingNote(method, satArray, doublingDecisions) {
     satArray[i].unshift(nextNote);
   }
   if (returningToSameScaleDegree){
+    doublingOpportunities[idx] = true;
     const newSatArray = satArray.map(subArray => [...subArray]);
     const regisSat = assigningToRegister(newSatArray[0], newSatArray[1], newSatArray[2]);
 
@@ -68,42 +69,33 @@ function assigningToRegister(s, a, t) {
   return [soprano, alto, tenor];
 }
 
-function generateSAT(progression, methodDecisions, doublingDecisions) {
+function generateSAT(progression, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities) {
   let s = [];
   let a = [];
   let t = [];
-  let decisionBools = [];
-  let decisionVoices = [];
 
   let last = spacingDict[progression[progression.length-1]];
-  let decision = false;
-  let dv = "";
+
   if (Array.isArray(last[0])) {
-    dv = last;
     last = last[0];
-    decision = true;
+    methodOpportunities[methodOpportunities.length-1] = true;
   }
 
   s.push(last[0]);
   a.push(last[1]);
   t.push(last[2]);
-  decisionBools.push(decision);
-  decisionVoices.push(dv);
 
   for (let i = progression.length - 1; i >= 1; i--){
     let progressionKey = progression[i] + " " + progression[i - 1];
     let path = progressionDict[progressionKey];
 
-    let methodForkBool = path.length > 1;
+    methodOpportunities[i-1] = path.length > 1;
     let method = path[methodDecisions[i-1]]; 
 
-    addingNote(method, [s, a, t], doublingDecisions);
-
-    decisionBools.unshift(methodForkBool);
-    decisionVoices.unshift(path);
+    addingNote(method, [s, a, t], doublingDecisions, doublingOpportunities, i-1);
   }
   let parts = assigningToRegister(s, a, t);
-  parts.push(methodDecisions, doublingDecisions);
+  parts.push(methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities);
 
   return parts;
 }
