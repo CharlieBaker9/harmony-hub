@@ -9,7 +9,7 @@ function obtainBassNotes(progression) {
     noteArr.push(dict[progArr[i]]);
   }
 
-  const endingNote = {"1": -6, "7": -7, "6": -8, "5": -9, "4": -10, "3": -11, "2": -12}
+  const endingNote = {"1": 1, "7": 0, "6": -1, "5": -2, "4": -3, "3": -4, "2": -5}
   let pitchedBassNotes = [];
   let state = 0;
 

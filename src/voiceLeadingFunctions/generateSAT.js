@@ -1,3 +1,4 @@
+import doublingChoice from './doublingChoice.js';
 const spacingDict = require('../dictionaries/openSpacing.json');
 const progressionDict = require('../dictionaries/progressionDict.json');
 
@@ -22,12 +23,24 @@ function addingNote(method, satArray, doublingDecisions) {
       }
     }
     satArray[i].unshift(nextNote);
+  }
+  if (returningToSameScaleDegree){
+    const newSatArray = satArray.map(subArray => [...subArray]);
+    const regisSat = assigningToRegister(newSatArray[0], newSatArray[1], newSatArray[2]);
 
+    const { correctVoicing, changed } = doublingChoice(satArray[0].slice(0,2), satArray[1].slice(0,2), satArray[2].slice(0,2), regisSat[0][1], regisSat[1][1], regisSat[2][1]);
+    for (let i = 0; i < 3; i++){
+      satArray[i][0] = correctVoicing[i];
+    }
+    if (changed) {
+      let index = doublingDecisions.length - satArray[0].length;
+      doublingDecisions[index] = doublingDecisions[index] === 1 ? 0 : 1;
+    }
   }
 }
 
 function adjustNote(noteIn, noteOut) {
-  return (((noteIn - noteOut + 10) % 7) - 3)
+  return (((noteIn - noteOut + 10) % 7) - 3);
 }
 
 function assigningToRegister(s, a, t) {
@@ -82,7 +95,6 @@ function generateSAT(progression, methodDecisions, doublingDecisions) {
     let path = progressionDict[progressionKey];
 
     let methodForkBool = path.length > 1;
-    console.log("method stuff", methodDecisions, i-1);
     let method = path[methodDecisions[i-1]]; 
 
     addingNote(method, [s, a, t], doublingDecisions);
@@ -93,16 +105,7 @@ function generateSAT(progression, methodDecisions, doublingDecisions) {
   let parts = assigningToRegister(s, a, t);
   parts.push(methodDecisions, doublingDecisions);
 
-
   return parts;
 }
 
-// const progression = 'IV V I I6 V I';
-// const progression2 = "I I6 I I6";
-// const notesArr = generateSAT(progression2);
-
-// console.log(notesArr[0]);
-// console.log(notesArr[1]);
-// console.log(notesArr[2]);
-
-module.exports = { generateSAT };
+export { generateSAT, adjustNote };
