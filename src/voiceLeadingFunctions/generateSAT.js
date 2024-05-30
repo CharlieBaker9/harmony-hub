@@ -1,7 +1,6 @@
 const spacingDict = require('../dictionaries/openSpacing.json');
 const progressionDict = require('../dictionaries/progressionDict.json');
 
-//get rid of idx and add all three SAT 
 function addingNote(method, satArray, doublingDecisions) {
   let returningToSameScaleDegree = false;
   for (let i = 0; i < 3; i++){
@@ -26,47 +25,6 @@ function addingNote(method, satArray, doublingDecisions) {
 
   }
 }
-
-// //get rid of idx and add all three SAT 
-// function addingNote(method, array, idx) {
-//   let currNote = array[0];
-
-//   while (currNote > 7) {
-//     currNote -= 7;
-//   }
-
-//   while (currNote < 0) {
-//     currNote += 7;
-//   }
-
-//   let nextNote = method[currNote];
-//   // console.log(method, array, idx);
-
-//   //this is doubling fork 
-//   if (Array.isArray(nextNote)){
-//     let tempIdx = idx;
-//     if (idx === 3){
-//       tempIdx = 0;
-//     }
-//     if (idx === 2){
-//       tempIdx = 1;
-//     }
-//     nextNote = nextNote[tempIdx];
-//     idx += 1;   //dumb -- need specific arrangement as it unfolds -- registral scale degrees
-//   }
-//   array.unshift(nextNote);
-
-//   return idx
-// }
-
-// function containsListOfNumbers(obj) {
-//   for (let key in obj) {
-//       if (Array.isArray(obj[key]) && obj[key].every(item => typeof item === 'number')) {
-//           return true;
-//       }
-//   }
-//   return false;
-// }
 
 function adjustNote(noteIn, noteOut) {
   return (((noteIn - noteOut + 10) % 7) - 3)
@@ -103,13 +61,10 @@ function generateSAT(progression) {
   let t = [];
   let decisionBools = [];
   let decisionVoices = [];
-  console.log(progression);
-  // let doublingDecisions = Array(progression.length-1).fill(true);
 
   const romanNumArray = progression.split(' ');
   let methodsDecisions = Array(romanNumArray.length-1).fill(0);
   let doublingDecisions = [true, true, true]
-  methodsDecisions[0] = 1;
 
   let last = spacingDict[romanNumArray[romanNumArray.length-1]];
   let decision = false;
@@ -130,26 +85,11 @@ function generateSAT(progression) {
     let progressionKey = romanNumArray[i] + " " + romanNumArray[i - 1];
     let path = progressionDict[progressionKey];
 
-    let methodForkBool = false; //make this a one liner
-    if (path.length > 1){
-      methodForkBool = true;
-    }
-
-    // use a method selection so that users can change between the different voice leadings 
+    let methodForkBool = path.length > 1;
     let method = path[methodsDecisions[i-1]]; 
 
-    // // means there are two ways to do spacing
-    // if (!(containsListOfNumbers(method))){
-      
-    // }
-    
-
-    // let idx = 0;
-  
     addingNote(method, [s, a, t], doublingDecisions);
-    // idx = addingNote(method, s, idx);
-    // idx = addingNote(method, a, idx);
-    // idx = addingNote(method, t, idx);
+
     decisionBools.unshift(methodForkBool);
     decisionVoices.unshift(path);
   }

@@ -67,6 +67,9 @@ function convertToXML(degrees) {
       "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
       "http://www.musicxml.org/dtds/partwise.dtd">
   <score-partwise version="4.0">
+  <work>
+    <work-title>Your Progression</work-title>
+  </work>
     <part-list>
       <score-part id="P1">
         <part-name>Treble</part-name>
