@@ -1,4 +1,5 @@
 import doublingChoice from './doublingChoice.js';
+import { matchingDoubling } from './matchingDoubling.js';
 const spacingDict = require('../dictionaries/openSpacing.json');
 const progressionDict = require('../dictionaries/progressionDict.json');
 
@@ -12,7 +13,7 @@ function addingNote(method, satArray, doublingDecisions, doublingOpportunities, 
 
     let nextNote = method[currNote];
 
-    //this is doubling fork 
+    // this is a doubling fork
     if (Array.isArray(nextNote)){
       const doublingPolarityBool = doublingDecisions[doublingDecisions.length - satArray[i].length];
       if (!returningToSameScaleDegree){
@@ -79,9 +80,10 @@ function generateSAT(progression, methodDecisions, methodOpportunities, doubling
 
   let last = spacingDict[progression[progression.length-1]];
 
+  // this is a doubling opportunity for the last chord
   if (Array.isArray(last[0])) {
     last = last[0];
-    methodOpportunities[methodOpportunities.length-1] = true;
+    doublingOpportunities[doublingOpportunities.length-1] = true;
   }
 
   s.push(last[0]);
@@ -91,6 +93,11 @@ function generateSAT(progression, methodDecisions, methodOpportunities, doubling
   for (let i = progression.length - 1; i >= 1; i--){
     let progressionKey = progression[i] + " " + progression[i - 1];
     let path = progressionDict[progressionKey];
+    console.log("path, progression key: ", path, progressionKey);
+    
+    if (path.length > 1){
+      path = matchingDoubling(path, s[0], a[0], t[0]);
+    } 
 
     methodOpportunities[i-1] = path.length > 1;
     let method = path[methodDecisions[i-1]]; 

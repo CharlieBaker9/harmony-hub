@@ -1,10 +1,11 @@
-// src/components/selectionScreen.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { obtainBassNotes, shiftBassNotes } from '../voiceLeadingFunctions/bassNotes.js';
 import { generateSAT } from '../voiceLeadingFunctions/generateSAT.js';
 import { convertToXML } from '../xml/xmlComputation.js';
+import { closedSpacingConversion } from '../voiceLeadingFunctions/closedSpacing.js';
 import Dropdown from '../Dropdown.js';
+import '../componentsStyling/selectionScreen.css';
 
 const initialOptions = ["I", "I6", "V", "V6", "V65", "V42", "V73", "V7", "vii°6"];
 
@@ -16,114 +17,74 @@ const nextChordOptions = {
   "V6": ["I"],
   "V43": ["I6", "I"],
   "vii°6": ["I", "I6"],
-
-  "V65": ["I"], //none 
-  "V42": ["I"], //none
-  "V73": ["I"], //none
-  "V7": ["I"], //none
+  "V65": ["I"],
+  "V42": ["I"],
+  "V73": ["I"],
+  "V7": ["I"],
 };
 
 function SelectionScreen() {
   const navigate = useNavigate();
+  const [chords, setChords] = useState(['']);
+  const [options, setOptions] = useState([initialOptions]);
+  const [isAddChordDisabled, setIsAddChordDisabled] = useState(true);
 
-  const [firstChord, setFirstChord] = useState('');
-  const [secondChord, setSecondChord] = useState('');
-  const [thirdChord, setThirdChord] = useState('');
-  const [fourthChord, setFourthChord] = useState('');
-  const [secondChordOptions, setSecondChordOptions] = useState([]);
-  const [thirdChordOptions, setThirdChordOptions] = useState([]);
-  const [fourthChordOptions, setFourthChordOptions] = useState([]);
-  const [isSecondDropdownDisabled, setIsSecondDropdownDisabled] = useState(true);
-  const [isThirdDropdownDisabled, setIsThirdDropdownDisabled] = useState(true);
-  const [isFourthDropdownDisabled, setIsFourthDropdownDisabled] = useState(true);
+  const handleDropdownChange = (event, index) => {
+    const newChords = [...chords];
+    newChords[index] = event.target.value;
+    setChords(newChords);
 
-  const handleFirstDropdownChange = (event) => {
-    const selectedChord = event.target.value;
-    setFirstChord(selectedChord);
-
-    if (selectedChord) {
-      const updatedOptions = nextChordOptions[selectedChord] || [];
-      setSecondChordOptions(updatedOptions);
-      setIsSecondDropdownDisabled(false);
-    } else {
-      setSecondChordOptions([]);
-      setIsSecondDropdownDisabled(true);
+    const newOptions = options.slice(0, index + 1);
+    if (newChords[index]) {
+      const updatedOptions = nextChordOptions[newChords[index]] || [];
+      newOptions[index + 1] = updatedOptions;
     }
+    setOptions(newOptions);
 
-    // Reset subsequent selections
-    setThirdChordOptions([]);
-    setIsThirdDropdownDisabled(true);
-    setFourthChordOptions([]);
-    setIsFourthDropdownDisabled(true);
+    // Enable the "Add Chord" button if the current chord is selected
+    setIsAddChordDisabled(!newChords[index]);
   };
 
-  const handleSecondDropdownChange = (event) => {
-    const selectedChord = event.target.value;
-    setSecondChord(selectedChord);
-
-    if (selectedChord) {
-      const updatedOptions = nextChordOptions[selectedChord] || [];
-      setThirdChordOptions(updatedOptions);
-      setIsThirdDropdownDisabled(false);
-    } else {
-      setThirdChordOptions([]);
-      setIsThirdDropdownDisabled(true);
-    }
-
-    // Reset the fourth selection
-    setFourthChordOptions([]);
-    setIsFourthDropdownDisabled(true);
+  const addDropdown = () => {
+    setChords([...chords, '']);
+    setIsAddChordDisabled(true); // Disable the "Add Chord" button after adding a new dropdown
   };
 
-  const handleThirdDropdownChange = (event) => {
-    const selectedChord = event.target.value;
-    setThirdChord(selectedChord);
-
-    if (selectedChord) {
-      const updatedOptions = nextChordOptions[selectedChord] || [];
-      setFourthChordOptions(updatedOptions);
-      setIsFourthDropdownDisabled(false);
-    } else {
-      setFourthChordOptions([]);
-      setIsFourthDropdownDisabled(true);
-    }
-  };
-
-  const handleFourthDropdownChange = (event) => {
-    const selectedChord = event.target.value;
-    setFourthChord(selectedChord);
-  };
-
-  const isComputeDisabled = !firstChord || !secondChord || !thirdChord || !fourthChord;
+  const isComputeDisabled = chords.some(chord => !chord);
 
   const compute = () => {
-    // Ensure that chord variables are strings. If they're not, this will cast them to strings.
-    const chordSequence = [firstChord, secondChord, thirdChord, fourthChord].join(' ').trim();
-  
+    const chordSequence = chords.join(' ').trim();
     if (!isComputeDisabled) {
       const bassNotes = obtainBassNotes(chordSequence);
-
-      const progression = chordSequence.split(' ');
+      const chordProgression = chordSequence.split(' ');
       let soprano, alto, tenor;
-      let methodDecisions = Array(progression.length).fill(0);
-      let methodOpportunities = Array(progression.length).fill(false);
-      let doublingDecisions = Array(progression.length-1).fill(false);
-      let doublingOpportunities = Array(progression.length-1).fill(false);
+      let methodDecisions = Array(chordProgression.length).fill(0);
+      let methodOpportunities = Array(chordProgression.length).fill(false);
+      let doublingDecisions = Array(chordProgression.length - 1).fill(false);
+      let doublingOpportunities = Array(chordProgression.length - 1).fill(false);
 
-
-      [soprano, alto, tenor, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities] = generateSAT(progression, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities);
+      [soprano, alto, tenor, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities] = generateSAT(chordProgression, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities);
 
       const bass = shiftBassNotes(tenor, bassNotes);
 
-      let formattedNotes = []
+      let formattedNotes = [];
       for (let i = 0; i < soprano.length; i++) {
-        formattedNotes.push([soprano[i], alto[i], tenor[i], bass[i]])
+        formattedNotes.push([soprano[i], alto[i], tenor[i], bass[i]]);
       }
 
-      const notesXml = convertToXML(formattedNotes);
+      const closedSpacingNotes = closedSpacingConversion(formattedNotes);
+
+      const openSpacingXml = convertToXML(formattedNotes, chordSequence);
+      let closedSpacingXml;
+
+      if (Array.isArray(closedSpacingNotes)) {
+        closedSpacingXml = convertToXML(closedSpacingNotes, chordSequence);
+      } else {
+        closedSpacingXml = NaN;
+      }
 
       let table = {
-        chord: [firstChord, secondChord, thirdChord, fourthChord],
+        chord: chords,
         soprano: soprano,
         alto: alto,
         tenor: tenor,
@@ -133,10 +94,8 @@ function SelectionScreen() {
         doublingDecisions: doublingDecisions,
         doublingOpportunities: doublingOpportunities
       };
-      
-      console.table(table);
-  
-      navigate('/compute', { state: { notesXml, table} });
+
+      navigate('/compute', { state: { openSpacingXml, closedSpacingXml, table} });
     }
   };
 
@@ -144,37 +103,23 @@ function SelectionScreen() {
     <div className="App">
       <header className="App-header">
         <h1>Harmony Hub</h1>
-        <Dropdown 
-          options={initialOptions} 
-          onChange={handleFirstDropdownChange} 
-          disabled={false}
-          value={firstChord}
-        />
-        {isSecondDropdownDisabled ? null : (
-          <Dropdown 
-            options={secondChordOptions} 
-            onChange={handleSecondDropdownChange} 
-            disabled={isSecondDropdownDisabled}
-            value={secondChord}
-          />
-        )}
-        {isThirdDropdownDisabled ? null : (
-          <Dropdown 
-            options={thirdChordOptions} 
-            onChange={handleThirdDropdownChange} 
-            disabled={isThirdDropdownDisabled}
-            value={thirdChord}
-          />
-        )}
-        {isFourthDropdownDisabled ? null : (
-          <Dropdown 
-            options={fourthChordOptions} 
-            onChange={handleFourthDropdownChange} 
-            disabled={isFourthDropdownDisabled}
-            value={fourthChord}
-          />
-        )}
-        <button onClick={compute} disabled={isComputeDisabled}>Compute</button>
+        <div className="controls-container">
+          {chords.map((chord, index) => (
+            <Dropdown
+              key={index}
+              options={options[index]}
+              onChange={(event) => handleDropdownChange(event, index)}
+              value={chord}
+              className="control"
+            />
+          ))}
+          <div className="button-container">
+            {chords.length < 8 && (
+              <button onClick={addDropdown} className="control" disabled={isAddChordDisabled}>Add Chord</button>
+            )}
+            <button onClick={compute} disabled={isComputeDisabled} className="control">Compute</button>
+          </div>
+        </div>
       </header>
     </div>
   );

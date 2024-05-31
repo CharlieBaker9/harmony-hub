@@ -1,0 +1,18 @@
+.decision-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.toggle-spacing-button {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.toggle-spacing-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

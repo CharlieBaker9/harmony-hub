@@ -1,12 +1,16 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import DecisionButton from './decisionButton';
+import '../componentsStyling/computeScreen.css';
 
 function ComputeScreen() {
   const osmdContainerRef = useRef(null);
   const osmdInstanceRef = useRef(null);
   const location = useLocation();
-  const { notesXml, table } = location.state || {};
+  const { openSpacingXml, closedSpacingXml, table } = location.state || {};
+
+  const [currentXml, setCurrentXml] = useState(openSpacingXml);
+  const [isClosedSpacingAvailable, setIsClosedSpacingAvailable] = useState(!!closedSpacingXml);
 
   useEffect(() => {
     const loadAndRenderOSMD = async () => {
@@ -31,14 +35,14 @@ function ComputeScreen() {
           backend: "svg",
           drawTitle: true,
         });
+      }
 
-        if (notesXml) {
-          osmdInstanceRef.current.load(notesXml)
-            .then(() => {
-              osmdInstanceRef.current.render();
-            })
-            .catch(error => console.error("Error loading or rendering the score", error));
-        }
+      if (osmdInstanceRef.current) {
+        osmdInstanceRef.current.load(currentXml)
+          .then(() => {
+            osmdInstanceRef.current.render();
+          })
+          .catch(error => console.error("Error loading or rendering the score", error));
       }
     };
 
@@ -48,25 +52,42 @@ function ComputeScreen() {
       const scripts = document.querySelectorAll('script[src="https://unpkg.com/opensheetmusicdisplay@0.8.3/build/opensheetmusicdisplay.min.js"]');
       scripts.forEach(script => document.body.removeChild(script));
     };
-  }, [notesXml]);
+  }, [currentXml]);
+
+  useEffect(() => {
+    setIsClosedSpacingAvailable(!!closedSpacingXml);
+  }, [closedSpacingXml]);
+
+  const toggleSpacing = () => {
+    if (isClosedSpacingAvailable) {
+      setCurrentXml(prevXml => (prevXml === openSpacingXml ? closedSpacingXml : openSpacingXml));
+    }
+  };
 
   return (
-    <div>
-      <div ref={osmdContainerRef} style={{ width: '100%', height: '100%' }} />
+    <div className="compute-screen">
+      <div ref={osmdContainerRef} className="osmd-container" />
       {table && (
-        <div>
-          <div>
+        <div className="info-container">
+          <div className="decision-buttons">
             {table.methodOpportunities.map((opportunity, index) => (
               <DecisionButton key={`method-${index}`} opportunity={opportunity} type="Method" />
             ))}
           </div>
-          <div>
+          <div className="decision-buttons">
             {table.doublingOpportunities.map((opportunity, index) => (
               <DecisionButton key={`doubling-${index}`} opportunity={opportunity} type="Doubling" />
             ))}
           </div>
         </div>
       )}
+      <button
+        onClick={toggleSpacing}
+        disabled={!isClosedSpacingAvailable}
+        className={`toggle-spacing-button ${!isClosedSpacingAvailable ? 'disabled' : ''}`}
+      >
+        {currentXml === openSpacingXml ? "Closed Spacing" : "Open Spacing"}
+      </button>
     </div>
   );
 }

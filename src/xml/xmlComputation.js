@@ -23,7 +23,7 @@ const adjustOctave = (degree) => {
 };
 
 // Function to convert scale degrees to MusicXML format
-function convertToXML(degrees) {
+function convertToXML(degrees, chordSequence) {
   const trebleClefNotes = degrees.map(degreeList => {
     return degreeList.slice(0, 2).map((degree, index) => {
       const normalizedDegree = normalizeDegree(degree);
@@ -67,9 +67,30 @@ function convertToXML(degrees) {
       "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
       "http://www.musicxml.org/dtds/partwise.dtd">
   <score-partwise version="4.0">
-  <work>
-    <work-title>Your Progression</work-title>
-  </work>
+    <work>
+      <work-title>${chordSequence}</work-title>
+    </work>
+    <defaults>
+      <scaling>
+        <millimeters>10.0</millimeters>
+        <tenths>80</tenths>
+      </scaling>
+      <system-layout>
+        <system-margins>
+          <left-margin>0</left-margin>
+          <right-margin>0</right-margin>
+        </system-margins>
+        <top-system-distance>40</top-system-distance>
+      </system-layout>
+      <page-layout>
+        <page-margins type="both">
+          <left-margin>20</left-margin>
+          <right-margin>20</right-margin>
+          <top-margin>50</top-margin>
+          <bottom-margin>20</bottom-margin>
+        </page-margins>
+      </page-layout>
+    </defaults>
     <part-list>
       <score-part id="P1">
         <part-name>Treble</part-name>
@@ -121,13 +142,14 @@ function convertToXML(degrees) {
   return fullXML;
 }
 
-// // Example usage
+// Example usage
 // const degrees = [
 //   [1, 3, 5, -2],
 //   [4, 6, 1, -3],
 //   [5, 7, 2, -4]
 // ];
 
-// const notesXML = convertToXML(degrees);
+// const chordSequence = "I IV V";
+// const notesXML = convertToXML(degrees, chordSequence);
 
 module.exports = { convertToXML };
