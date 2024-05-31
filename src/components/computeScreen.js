@@ -1,4 +1,3 @@
-// src/components/computeScreen.js
 import React, { useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import DecisionButton from './decisionButton';
@@ -56,8 +55,16 @@ function ComputeScreen() {
       <div ref={osmdContainerRef} style={{ width: '100%', height: '100%' }} />
       {table && (
         <div>
-          <DecisionButton label="Method Decisions" text={JSON.stringify(table.methodDecisions, null, 2)} />
-          <DecisionButton label="Doubling Decisions" text={JSON.stringify(table.doublingDecisions, null, 2)} />
+          <div>
+            {table.methodOpportunities.map((opportunity, index) => (
+              <DecisionButton key={`method-${index}`} opportunity={opportunity} type="Method" />
+            ))}
+          </div>
+          <div>
+            {table.doublingOpportunities.map((opportunity, index) => (
+              <DecisionButton key={`doubling-${index}`} opportunity={opportunity} type="Doubling" />
+            ))}
+          </div>
         </div>
       )}
     </div>

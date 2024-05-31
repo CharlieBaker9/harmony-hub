@@ -5,15 +5,15 @@ function doublingChoice(s, a, t, registerS, registerA, registerT) {
 
   let tempS, tempA, tempT;
 
-  if (s[1] === a[1]){
+  if ((s[1]+70) % 7 === (a[1]+70) % 7 ){
     tempS = a[0];
     tempA = s[0];
     tempT = t[0];
-  } else if (s[1] === t[1]){
+  } else if ((s[1]+70) % 7  === (t[1]+70) % 7 ){
     tempS = t[0];
     tempA = a[0];
     tempT = s[0];
-  } else if (a[1] === t[1]){
+  } else if ((a[1]+70) % 7  === (t[1]+70) % 7 ){
     tempS = s[0];
     tempA = t[0];
     tempT = a[0];
@@ -30,18 +30,21 @@ function doublingChoice(s, a, t, registerS, registerA, registerT) {
     correctVoicing = [tempS, tempA, tempT];
     change = true;
   } else {
-
-    //what do I do in this case
+    // probably won't happen
+    // Alert("Something went wrong -- spacing is most likely wrong");
     correctVoicing = [currS, currA, currT];
   }
 
   return { correctVoicing, change };
 }
 
+// the expected types of values are the S,A,T parts in registral parts
+// the prev values should be integers 1 through 7
+// the next values are integers without limitation (which represent registral notes that occur after the prev note)
 function checkSpacing(sPrev, aPrev, tPrev, sNext, aNext, tNext){
-  const s = adjustNote(sPrev, sNext);
-  const a = adjustNote(aPrev, aNext);
-  const t = adjustNote(tPrev, tNext);
+  const s = sNext + adjustNote(sNext, sPrev);
+  const a = aNext + adjustNote(aNext, aPrev);
+  const t = tNext + adjustNote(tNext, tPrev);
 
   if (((s - a) < 7) && ((a - t) < 7) && ((s - t) > 7)){
     return true;

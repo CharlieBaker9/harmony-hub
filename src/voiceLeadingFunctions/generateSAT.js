@@ -40,29 +40,32 @@ function addingNote(method, satArray, doublingDecisions, doublingOpportunities, 
   }
 }
 
-function adjustNote(noteIn, noteOut) {
-  return (((noteIn - noteOut + 10) % 7) - 3);
+// origin: linear scale degree
+// targetDegree: modular scale degree
+// returns: adjustment to linear scale degree (between -3 and 3)
+function adjustNote(origin, targetDegree) {
+  return (((targetDegree - origin + 10) % 7) - 3);
 }
 
 function assigningToRegister(s, a, t) {
   // shifting soprano
   let soprano = [s[s.length-1]];
   for (let i = s.length - 2; i >= 0; i--){
-    let temp = soprano[0] + adjustNote(s[i], s[i+1]);
+    let temp = soprano[0] + adjustNote(s[i+1], s[i]);
     soprano.unshift(temp);
   }
 
   // shifting alto
   let alto = [a[a.length-1]];
   for (let i = a.length - 2; i >= 0; i--){
-    let temp = alto[0] + adjustNote(a[i], a[i+1]);
+    let temp = alto[0] + adjustNote(a[i+1], a[i]);
     alto.unshift(temp);
   }
 
   // shifting tenor
   let tenor = [t[t.length-1]];
   for (let i = t.length - 2; i >= 0; i--){
-    let temp = tenor[0] + adjustNote(t[i], t[i+1]);
+    let temp = tenor[0] + adjustNote(t[i+1], t[i]);
     tenor.unshift(temp);
   }
 

@@ -1,18 +1,29 @@
-// src/components/decisionButton.js
 import React, { useState } from 'react';
 
-function DecisionButton({ label, text }) {
-  const [isVisible, setIsVisible] = useState(false);
+function DecisionButton({ opportunity, type }) {
+  const [isClicked, setIsClicked] = useState(false);
 
   const handleClick = () => {
-    setIsVisible(!isVisible);
+    setIsClicked(!isClicked);
   };
 
+  if (!opportunity) {
+    // Return a placeholder div to keep spacing consistent
+    return <div style={{ display: 'inline-block', width: '75px', height: '30px' }} />;
+  }
+
   return (
-    <div>
-      <button onClick={handleClick}>{label}</button>
-      {isVisible && <pre>{text}</pre>}
-    </div>
+    <button
+      onClick={handleClick}
+      style={{
+        width: '75px',
+        height: '30px',
+        backgroundColor: isClicked ? 'red' : 'initial',
+        margin: '5px',
+      }}
+    >
+      {type}
+    </button>
   );
 }
 
