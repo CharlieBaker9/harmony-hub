@@ -110,7 +110,7 @@ function SelectionScreen() {
       }
 
       let table = {
-        chord: chords,
+        chords: chords,
         soprano: soprano,
         alto: alto,
         tenor: tenor,

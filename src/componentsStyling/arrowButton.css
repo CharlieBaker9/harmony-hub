@@ -1,0 +1,19 @@
+.arrow-button {
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 3px;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin: 0 5px;
+  transition: background-color 0.3s ease;
+}
+
+.arrow-button.clicked {
+  background-color: red;
+}
+
+.arrow-button.disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
