@@ -15,27 +15,20 @@ const adjustOctave = (degree, scale) => {
 
 // Function to convert scale degrees to MusicXML format
 function convertToXML(degrees, chordSequence, key, durations) {
-  const measureDuration = 4; // Duration of a measure in quarter notes
-  let currentDuration = 0; // Duration counter for the current measure
-  let measureCount = 1; // Measure counter
   let scale = keyDict[key];
-  // let scale = keyDict[key]; // Get the scale based on the key parameter
 
-  const createNoteXML = (degree, index) => {
+  const createNoteXML = (degree, duration, isChord) => {
     const normalizedDegree = normalizeDegree(degree);
     const note = scale[normalizedDegree.toString()];
     const octave = adjustOctave(degree, scale);
-    const duration = 0.5;
     let isEighthNote = (duration === 0.25);
-    
-    // const duration = durations[index]; // Use the duration passed as argument
 
-    let noteXML = `
+    return `
       <note>
-        ${index > 0 ? '<chord/>' : ''}
+        ${isChord ? '<chord/>' : ''}
         <pitch>
           <step>${note.step}</step>
-          ${note.alter !== 0 ? `<alter>${note.alter}</alter>` : ''}
+          ${note.alter !== undefined ? `<alter>${note.alter}</alter>` : ''}
           <octave>${octave}</octave>
         </pitch>
         <duration>${duration}</duration>
@@ -47,26 +40,14 @@ function convertToXML(degrees, chordSequence, key, durations) {
         }</type>
         ${isEighthNote ? '<beam number="1">begin</beam>' : ''}
       </note>`;
-
-    currentDuration += duration;
-
-    // Add measure closing and opening tags if measure is full
-    if (currentDuration >= measureDuration) {
-      noteXML += `
-        </measure>
-        <measure number="${++measureCount}">`;
-      currentDuration = 0;
-    }
-
-    return noteXML;
   };
 
-  const trebleClefNotes = degrees.map(degreeList => {
-    return degreeList.slice(0, 2).map(createNoteXML).join('\n');
+  const trebleClefNotes = degrees.map((degreeList, idx) => {
+    return degreeList.slice(0, 2).map((degree, noteIdx) => createNoteXML(degree, durations[idx], noteIdx === 1)).join('\n');
   }).join('\n');
 
-  const bassClefNotes = degrees.map(degreeList => {
-    return degreeList.slice(2, 4).map(createNoteXML).join('\n');
+  const bassClefNotes = degrees.map((degreeList, idx) => {
+    return degreeList.slice(2, 4).map((degree, noteIdx) => createNoteXML(degree, durations[idx], noteIdx === 1)).join('\n');
   }).join('\n');
 
   const fullXML = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -148,15 +129,5 @@ function convertToXML(degrees, chordSequence, key, durations) {
 
   return fullXML;
 }
-
-// Example usage
-// const degrees = [
-//   [1, 3, 5, -2],
-//   [4, 6, 1, -3],
-//   [5, 7, 2, -4]
-// ];
-
-// const chordSequence = "I IV V";
-// const notesXML = convertToXML(degrees, chordSequence, "C", [4, 4, 4, 4]);
 
 module.exports = { convertToXML };

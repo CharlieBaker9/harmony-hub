@@ -4,7 +4,7 @@ import { obtainBassNotes, shiftBassNotes } from '../voiceLeadingFunctions/bassNo
 import { generateSAT } from '../voiceLeadingFunctions/generateSAT.js';
 import { convertToXML } from '../xml/xmlComputation.js';
 import { closedSpacingConversion } from '../voiceLeadingFunctions/closedSpacing.js';
-import Dropdown from '../Dropdown.js';
+import Dropdown from './Dropdown.js';
 import '../componentsStyling/selectionScreen.css';
 
 const initialOptions = ["I", "I6", "V", "V6", "V65", "V42", "V73", "V7", "vii°6"];
@@ -25,9 +25,18 @@ const nextChordOptions = {
 
 const keyOptions = ["C", "G", "D", "A", "E", "F", "B♭", "E♭", "A♭", "B", "C♭", "F#", "G♭", "C#", "D♭"];
 
+const durationOptions = ['Whole', 'Half', 'Quarter', 'Eighth'];
+const durationDict = {
+  'Whole': 2,
+  'Half': 1,
+  'Quarter': 0.5,
+  'Eighth': 0.25
+};
+
 function SelectionScreen() {
   const navigate = useNavigate();
   const [chords, setChords] = useState(['']);
+  const [durations, setDurations] = useState(['']);
   const [options, setOptions] = useState([initialOptions]);
   const [isAddChordDisabled, setIsAddChordDisabled] = useState(true);
   const [selectedKey, setSelectedKey] = useState('');
@@ -48,16 +57,23 @@ function SelectionScreen() {
     setIsAddChordDisabled(!newChords[index]);
   };
 
+  const handleDurationChange = (event, index) => {
+    const newDurations = [...durations];
+    newDurations[index] = event.target.value;
+    setDurations(newDurations);
+  };
+
   const handleKeyChange = (event) => {
     setSelectedKey(event.target.value);
   };
 
   const addDropdown = () => {
     setChords([...chords, '']);
+    setDurations([...durations, '']);
     setIsAddChordDisabled(true); // Disable the "Add Chord" button after adding a new dropdown
   };
 
-  const isComputeDisabled = !selectedKey || chords.some(chord => !chord);
+  const isComputeDisabled = !selectedKey || chords.some(chord => !chord) || durations.some(duration => !duration);
 
   const compute = () => {
     const chordSequence = chords.join(' ').trim();
@@ -81,11 +97,14 @@ function SelectionScreen() {
 
       const closedSpacingNotes = closedSpacingConversion(formattedNotes);
 
-      const openSpacingXml = convertToXML(formattedNotes, chordSequence, selectedKey, [4, 2, 1, 0.5]); // Pass the selected key
+      // Convert duration labels to values
+      const durationValues = durations.map(duration => durationDict[duration]);
+
+      const openSpacingXml = convertToXML(formattedNotes, chordSequence, selectedKey, durationValues); // Pass the selected key and durations
       let closedSpacingXml;
 
       if (Array.isArray(closedSpacingNotes)) {
-        closedSpacingXml = convertToXML(closedSpacingNotes, chordSequence, selectedKey, [4, 2, 1, 0.5]); // Pass the selected key
+        closedSpacingXml = convertToXML(closedSpacingNotes, chordSequence, selectedKey, durationValues); // Pass the selected key and durations
       } else {
         closedSpacingXml = NaN;
       }
@@ -121,12 +140,19 @@ function SelectionScreen() {
           />
           <label>Select Chords</label>
           {chords.map((chord, index) => (
-            <div key={index}>
+            <div key={index} className="chord-duration-container">
               <Dropdown
                 id={`chordDropdown${index}`}
                 options={options[index]}
                 onChange={(event) => handleDropdownChange(event, index)}
                 value={chord}
+                className="control"
+              />
+              <Dropdown
+                id={`durationDropdown${index}`}
+                options={durationOptions}
+                onChange={(event) => handleDurationChange(event, index)}
+                value={durations[index]}
                 className="control"
               />
             </div>

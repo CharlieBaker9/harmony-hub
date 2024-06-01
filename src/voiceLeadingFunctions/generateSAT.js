@@ -93,7 +93,6 @@ function generateSAT(progression, methodDecisions, methodOpportunities, doubling
   for (let i = progression.length - 1; i >= 1; i--){
     let progressionKey = progression[i] + " " + progression[i - 1];
     let path = progressionDict[progressionKey];
-    console.log("path, progression key: ", path, progressionKey);
     
     if (path.length > 1){
       path = matchingDoubling(path, s[0], a[0], t[0]);
