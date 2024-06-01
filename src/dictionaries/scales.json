@@ -1,0 +1,137 @@
+{
+  "C": {
+    "1": { "step": "C", "octave": 4, "alter": 0 },
+    "2": { "step": "D", "octave": 4, "alter": 0 },
+    "3": { "step": "E", "octave": 4, "alter": 0 },
+    "4": { "step": "F", "octave": 4, "alter": 0 },
+    "5": { "step": "G", "octave": 4, "alter": 0 },
+    "6": { "step": "A", "octave": 4, "alter": 0 },
+    "7": { "step": "B", "octave": 4, "alter": 0 }
+  },
+  "G": {
+    "1": { "step": "G", "octave": 3, "alter": 0 },
+    "2": { "step": "A", "octave": 3, "alter": 0 },
+    "3": { "step": "B", "octave": 3, "alter": 0 },
+    "4": { "step": "C", "octave": 3, "alter": 0 },
+    "5": { "step": "D", "octave": 3, "alter": 0 },
+    "6": { "step": "E", "octave": 3, "alter": 0 },
+    "7": { "step": "F", "octave": 3, "alter": 1 }
+  },
+  "D": {
+    "1": { "step": "D", "octave": 4, "alter": 0 },
+    "2": { "step": "E", "octave": 4, "alter": 0 },
+    "3": { "step": "F", "octave": 4, "alter": 1 },
+    "4": { "step": "G", "octave": 4, "alter": 0 },
+    "5": { "step": "A", "octave": 4, "alter": 0 },
+    "6": { "step": "B", "octave": 4, "alter": 0 },
+    "7": { "step": "C", "octave": 4, "alter": 1 }
+  },
+  "A": {
+    "1": { "step": "A", "octave": 3, "alter": 0 },
+    "2": { "step": "B", "octave": 3, "alter": 0 },
+    "3": { "step": "C", "octave": 3, "alter": 1 },
+    "4": { "step": "D", "octave": 3, "alter": 0 },
+    "5": { "step": "E", "octave": 3, "alter": 0 },
+    "6": { "step": "F", "octave": 3, "alter": 1 },
+    "7": { "step": "G", "octave": 3, "alter": 1 }
+  },
+  "E": {
+    "1": { "step": "E", "octave": 4, "alter": 0 },
+    "2": { "step": "F", "octave": 4, "alter": 1 },
+    "3": { "step": "G", "octave": 4, "alter": 1 },
+    "4": { "step": "A", "octave": 4, "alter": 0 },
+    "5": { "step": "B", "octave": 4, "alter": 0 },
+    "6": { "step": "C", "octave": 4, "alter": 1 },
+    "7": { "step": "D", "octave": 4, "alter": 1 }
+  },
+  "F": {
+    "1": { "step": "F", "octave": 4, "alter": 0 },
+    "2": { "step": "G", "octave": 4, "alter": 0 },
+    "3": { "step": "A", "octave": 4, "alter": 0 },
+    "4": { "step": "B", "octave": 4, "alter": -1 },
+    "5": { "step": "C", "octave": 4, "alter": 0 },
+    "6": { "step": "D", "octave": 4, "alter": 0 },
+    "7": { "step": "E", "octave": 4, "alter": 0 }
+  },
+  "B♭": {
+    "1": { "step": "B", "octave": 3, "alter": -1 },
+    "2": { "step": "C", "octave": 3, "alter": 0 },
+    "3": { "step": "D", "octave": 3, "alter": 0 },
+    "4": { "step": "E", "octave": 3, "alter": -1 },
+    "5": { "step": "F", "octave": 3, "alter": 0 },
+    "6": { "step": "G", "octave": 3, "alter": 0 },
+    "7": { "step": "A", "octave": 3, "alter": -1 }
+  },
+  "E♭": {
+    "1": { "step": "E", "octave": 4, "alter": -1 },
+    "2": { "step": "F", "octave": 4, "alter": 0 },
+    "3": { "step": "G", "octave": 4, "alter": 0 },
+    "4": { "step": "A", "octave": 4, "alter": -1 },
+    "5": { "step": "B", "octave": 4, "alter": -1 },
+    "6": { "step": "C", "octave": 4, "alter": 0 },
+    "7": { "step": "D", "octave": 4, "alter": -1 }
+  },
+  "A♭": {
+    "1": { "step": "A", "octave": 3, "alter": -1 },
+    "2": { "step": "B", "octave": 3, "alter": -1 },
+    "3": { "step": "C", "octave": 3, "alter": 0 },
+    "4": { "step": "D", "octave": 3, "alter": -1 },
+    "5": { "step": "E", "octave": 3, "alter": -1 },
+    "6": { "step": "F", "octave": 3, "alter": 0 },
+    "7": { "step": "G", "octave": 3, "alter": -1 }
+  },
+  "B": {
+    "1": { "step": "B", "octave": 3, "alter": 0 },
+    "2": { "step": "C", "octave": 3, "alter": 1 },
+    "3": { "step": "D", "octave": 3, "alter": 1 },
+    "4": { "step": "E", "octave": 3, "alter": 0 },
+    "5": { "step": "F", "octave": 3, "alter": 1 },
+    "6": { "step": "G", "octave": 3, "alter": 1 },
+    "7": { "step": "A", "octave": 3, "alter": 1 }
+  },
+  "C♭": {
+    "1": { "step": "C", "octave": 3, "alter": -1 },
+    "2": { "step": "D", "octave": 3, "alter": -1 },
+    "3": { "step": "E", "octave": 3, "alter": -1 },
+    "4": { "step": "F", "octave": 3, "alter": -1 },
+    "5": { "step": "G", "octave": 3, "alter": -1 },
+    "6": { "step": "A", "octave": 3, "alter": -1 },
+    "7": { "step": "B", "octave": 3, "alter": -1 }
+  },
+  "F#": {
+    "1": { "step": "F", "octave": 4, "alter": 1 },
+    "2": { "step": "G", "octave": 4, "alter": 0 },
+    "3": { "step": "A", "octave": 4, "alter": 0 },
+    "4": { "step": "B", "octave": 4, "alter": 0 },
+    "5": { "step": "C", "octave": 4, "alter": 1 },
+    "6": { "step": "D", "octave": 4, "alter": 1 },
+    "7": { "step": "E", "octave": 4, "alter": 1 }
+  },
+  "G♭": {
+    "1": { "step": "G", "octave": 4, "alter": -1 },
+    "2": { "step": "A", "octave": 4, "alter": -1 },
+    "3": { "step": "B", "octave": 4, "alter": -1 },
+    "4": { "step": "C", "octave": 4, "alter": -1 },
+    "5": { "step": "D", "octave": 4, "alter": -1 },
+    "6": { "step": "E", "octave": 4, "alter": -1 },
+    "7": { "step": "F", "octave": 4, "alter": -1 }
+  },
+  "C#": {
+    "1": { "step": "C", "octave": 4, "alter": 1 },
+    "2": { "step": "D", "octave": 4, "alter": 1 },
+    "3": { "step": "E", "octave": 4, "alter": 1 },
+    "4": { "step": "F", "octave": 4, "alter": 1 },
+    "5": { "step": "G", "octave": 4, "alter": 1 },
+    "6": { "step": "A", "octave": 4, "alter": 1 },
+    "7": { "step": "B", "octave": 4, "alter": 1 }
+  },
+  "D♭": {
+    "1": { "step": "D", "octave": 4, "alter": -1 },
+    "2": { "step": "E", "octave": 4, "alter": -1 },
+    "3": { "step": "F", "octave": 4, "alter": 0 },
+    "4": { "step": "G", "octave": 4, "alter": -1 },
+    "5": { "step": "A", "octave": 4, "alter": -1 },
+    "6": { "step": "B", "octave": 4, "alter": -1 },
+    "7": { "step": "C", "octave": 4, "alter": 0 }
+  }
+}

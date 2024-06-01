@@ -23,11 +23,14 @@ const nextChordOptions = {
   "V7": ["I"],
 };
 
+const keyOptions = ["C", "G", "D", "A", "E", "F", "B♭", "E♭", "A♭", "B", "C♭", "F#", "G♭", "C#", "D♭"];
+
 function SelectionScreen() {
   const navigate = useNavigate();
   const [chords, setChords] = useState(['']);
   const [options, setOptions] = useState([initialOptions]);
   const [isAddChordDisabled, setIsAddChordDisabled] = useState(true);
+  const [selectedKey, setSelectedKey] = useState('');
 
   const handleDropdownChange = (event, index) => {
     const newChords = [...chords];
@@ -45,12 +48,16 @@ function SelectionScreen() {
     setIsAddChordDisabled(!newChords[index]);
   };
 
+  const handleKeyChange = (event) => {
+    setSelectedKey(event.target.value);
+  };
+
   const addDropdown = () => {
     setChords([...chords, '']);
     setIsAddChordDisabled(true); // Disable the "Add Chord" button after adding a new dropdown
   };
 
-  const isComputeDisabled = chords.some(chord => !chord);
+  const isComputeDisabled = !selectedKey || chords.some(chord => !chord);
 
   const compute = () => {
     const chordSequence = chords.join(' ').trim();
@@ -74,11 +81,11 @@ function SelectionScreen() {
 
       const closedSpacingNotes = closedSpacingConversion(formattedNotes);
 
-      const openSpacingXml = convertToXML(formattedNotes, chordSequence);
+      const openSpacingXml = convertToXML(formattedNotes, chordSequence, selectedKey, [4, 2, 1, 0.5]); // Pass the selected key
       let closedSpacingXml;
 
       if (Array.isArray(closedSpacingNotes)) {
-        closedSpacingXml = convertToXML(closedSpacingNotes, chordSequence);
+        closedSpacingXml = convertToXML(closedSpacingNotes, chordSequence, selectedKey, [4, 2, 1, 0.5]); // Pass the selected key
       } else {
         closedSpacingXml = NaN;
       }
@@ -104,14 +111,25 @@ function SelectionScreen() {
       <header className="App-header">
         <h1>Harmony Hub</h1>
         <div className="controls-container">
+          <label htmlFor="keyDropdown">Select Key</label>
+          <Dropdown
+            id="keyDropdown"
+            options={keyOptions}
+            onChange={handleKeyChange}
+            value={selectedKey}
+            className="control"
+          />
+          <label>Select Chords</label>
           {chords.map((chord, index) => (
-            <Dropdown
-              key={index}
-              options={options[index]}
-              onChange={(event) => handleDropdownChange(event, index)}
-              value={chord}
-              className="control"
-            />
+            <div key={index}>
+              <Dropdown
+                id={`chordDropdown${index}`}
+                options={options[index]}
+                onChange={(event) => handleDropdownChange(event, index)}
+                value={chord}
+                className="control"
+              />
+            </div>
           ))}
           <div className="button-container">
             {chords.length < 8 && (

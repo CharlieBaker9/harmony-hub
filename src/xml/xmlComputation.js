@@ -1,13 +1,4 @@
-// Define the scale and corresponding notes in octave 4
-const scale = {
-  1: { step: 'C', octave: 4 },
-  2: { step: 'D', octave: 4 },
-  3: { step: 'E', octave: 4 },
-  4: { step: 'F', octave: 4 },
-  5: { step: 'G', octave: 4 },
-  6: { step: 'A', octave: 4 },
-  7: { step: 'B', octave: 4 }
-};
+const keyDict = require('../dictionaries/scales.json');
 
 // Function to normalize the degree to fall within 1-7
 const normalizeDegree = (degree) => {
@@ -15,51 +6,67 @@ const normalizeDegree = (degree) => {
 };
 
 // Function to adjust the octave based on the register
-const adjustOctave = (degree) => {
+const adjustOctave = (degree, scale) => {
   const normalizedDegree = normalizeDegree(degree);
-  const baseOctave = scale[normalizedDegree].octave;
+  const baseOctave = scale[normalizedDegree.toString()].octave;
   const register = Math.floor((degree - 1) / 7);
   return baseOctave + register;
 };
 
 // Function to convert scale degrees to MusicXML format
-function convertToXML(degrees, chordSequence) {
-  const trebleClefNotes = degrees.map(degreeList => {
-    return degreeList.slice(0, 2).map((degree, index) => {
-      const normalizedDegree = normalizeDegree(degree);
-      const note = scale[normalizedDegree];
-      const octave = adjustOctave(degree);
+function convertToXML(degrees, chordSequence, key, durations) {
+  const measureDuration = 4; // Duration of a measure in quarter notes
+  let currentDuration = 0; // Duration counter for the current measure
+  let measureCount = 1; // Measure counter
+  let scale = keyDict[key];
+  // let scale = keyDict[key]; // Get the scale based on the key parameter
 
-      return `
-        <note>
-          ${index > 0 ? '<chord/>' : ''}
-          <pitch>
-            <step>${note.step}</step>
-            <octave>${octave}</octave>
-          </pitch>
-          <duration>4</duration>
-          <type>whole</type>
-        </note>`;
-    }).join('\n');
+  const createNoteXML = (degree, index) => {
+    const normalizedDegree = normalizeDegree(degree);
+    const note = scale[normalizedDegree.toString()];
+    const octave = adjustOctave(degree, scale);
+    const duration = 0.5;
+    let isEighthNote = (duration === 0.25);
+    
+    // const duration = durations[index]; // Use the duration passed as argument
+
+    let noteXML = `
+      <note>
+        ${index > 0 ? '<chord/>' : ''}
+        <pitch>
+          <step>${note.step}</step>
+          ${note.alter !== 0 ? `<alter>${note.alter}</alter>` : ''}
+          <octave>${octave}</octave>
+        </pitch>
+        <duration>${duration}</duration>
+        <type>${
+          duration === 2 ? 'whole' :
+          duration === 1 ? 'half' :
+          duration === 0.5 ? 'quarter' :
+          duration === 0.25 ? 'eighth' : 'unknown'
+        }</type>
+        ${isEighthNote ? '<beam number="1">begin</beam>' : ''}
+      </note>`;
+
+    currentDuration += duration;
+
+    // Add measure closing and opening tags if measure is full
+    if (currentDuration >= measureDuration) {
+      noteXML += `
+        </measure>
+        <measure number="${++measureCount}">`;
+      currentDuration = 0;
+    }
+
+    return noteXML;
+  };
+
+  const trebleClefNotes = degrees.map(degreeList => {
+    return degreeList.slice(0, 2).map(createNoteXML).join('\n');
   }).join('\n');
 
   const bassClefNotes = degrees.map(degreeList => {
-    return degreeList.slice(2, 4).map((degree, index) => {
-      const normalizedDegree = normalizeDegree(degree);
-      const note = scale[normalizedDegree];
-      const octave = adjustOctave(degree);
-
-      return `
-        <note>
-          ${index > 0 ? '<chord/>' : ''}
-          <pitch>
-            <step>${note.step}</step>
-            <octave>${octave}</octave>
-          </pitch>
-          <duration>4</duration>
-          <type>whole</type>
-        </note>`;
-    }).join('\n');
+    return degreeList.slice(2, 4).map(createNoteXML).join('\n');
   }).join('\n');
 
   const fullXML = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -68,7 +75,7 @@ function convertToXML(degrees, chordSequence) {
       "http://www.musicxml.org/dtds/partwise.dtd">
   <score-partwise version="4.0">
     <work>
-      <work-title>${chordSequence}</work-title>
+      <work-title>${chordSequence + " in " + key + " Major"}</work-title>
     </work>
     <defaults>
       <scaling>
@@ -150,6 +157,6 @@ function convertToXML(degrees, chordSequence) {
 // ];
 
 // const chordSequence = "I IV V";
-// const notesXML = convertToXML(degrees, chordSequence);
+// const notesXML = convertToXML(degrees, chordSequence, "C", [4, 4, 4, 4]);
 
 module.exports = { convertToXML };
