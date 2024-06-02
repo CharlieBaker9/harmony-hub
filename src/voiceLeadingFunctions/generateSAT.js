@@ -115,11 +115,10 @@ function generateSAT(progression, methodDecisions, methodOpportunities, doubling
         doublingDecisions[i-1] = root;
         path = [doublingDict[root]];
         doublingOpportunities[i-1] = doublingDict;
+      } else {
+        methodOpportunities[i-1] = path;
       }
-      // path = matchingDoubling(path, s[0], a[0], t[0]);
     } 
-
-    methodOpportunities[i-1] = path.length > 1;
     let method = path[methodDecisions[i-1]]; 
 
     addingNote(method, [s, a, t], forkingDecisions, forkingOpportunities, i-1);

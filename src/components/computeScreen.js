@@ -29,8 +29,9 @@ function ComputeScreen() {
   );
 
   const [activeDoublingDecisions, setActiveDoublingDecisions] = useState(table.doublingDecisions || {});
+  const [activeMethodButtons, setActiveMethodButtons] = useState({});
 
-  console.log("doublingOpportunities, activeDoublingDecisions in compute: ", doublingOpportunities, activeDoublingDecisions);
+  // console.log("doublingOpportunities, activeDoublingDecisions in compute: ", doublingOpportunities, activeDoublingDecisions);
 
   const updateCurrentDegrees = (row, index, type) => {
     setCurrentDegrees(prevDegrees => {
@@ -62,11 +63,19 @@ function ComputeScreen() {
     updateCurrentDegrees(row, index, type);
   };
 
-  const handleOpportunityClick = (index, opportunity) => {
-    setActiveDoublingDecisions(prevState => ({
-      ...prevState,
-      [index]: opportunity
-    }));
+  const handleOpportunityClick = (index, type, opportunity) => {
+    if (type === "Doubling") {
+      setActiveDoublingDecisions(prevState => ({
+        ...prevState,
+        [index]: opportunity
+      }));
+    } else if (type === "Method") {
+      setActiveMethodButtons(prevState => ({
+        ...prevState,
+        [index]: opportunity
+      }));
+    }
+    console.log(`Clicked ${type} button at index ${index} with opportunity ${opportunity}`);
   };
 
   useEffect(() => {
@@ -156,7 +165,8 @@ function ComputeScreen() {
                           opportunity={key} // Opportunity for click handling
                           type="Doubling"
                           isActive={activeDoublingDecisions[index] === key}
-                          onClick={() => handleOpportunityClick(index, key)}
+                          index={index}
+                          onClick={handleOpportunityClick}
                         />
                       ))
                     ) : (
@@ -185,13 +195,16 @@ function ComputeScreen() {
                 <td>Method</td>
                 {methodOpportunities.map((opportunity, index) => (
                   <td key={`method-${index}`}>
-                    <DecisionButton
-                      text="Method Text" // Example text
-                      opportunity={opportunity} // Opportunity for click handling
-                      type="Method"
-                      isActive={false} // Add state management if needed
-                      onClick={() => console.log('Method Clicked')}
-                    />
+                    {opportunity !== false && (
+                      <DecisionButton
+                        text="Method"
+                        opportunity={opportunity} // Opportunity for click handling
+                        type="Method"
+                        isActive={activeMethodButtons[index] === opportunity} // Check if the button is active
+                        index={index}
+                        onClick={handleOpportunityClick}
+                      />
+                    )}
                   </td>
                 ))}
               </tr>
@@ -204,7 +217,8 @@ function ComputeScreen() {
                       opportunity={opportunity} // Opportunity for click handling
                       type="Forking"
                       isActive={false} // Add state management if needed
-                      onClick={() => console.log('Forking Clicked')}
+                      index={index}
+                      onClick={handleOpportunityClick}
                     />
                   </td>
                 ))}

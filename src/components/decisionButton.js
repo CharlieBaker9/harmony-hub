@@ -1,9 +1,9 @@
 import React from 'react';
 import '../componentsStyling/decisionButton.css';
 
-const DecisionButton = ({ text, opportunity, type, isActive, onClick }) => {
+const DecisionButton = ({ text, opportunity, type, isActive, onClick, index }) => {
   const handleClick = () => {
-    onClick(opportunity);
+    onClick(index, type, opportunity);
   };
 
   return (
