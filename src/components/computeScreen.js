@@ -2,25 +2,64 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import DecisionButton from './decisionButton';
 import ArrowButton from './arrowButton';
+import { bassInterventionAvailability, satInterventionAvailability } from '../voiceLeadingFunctions/interventionOpportunities';
 import '../componentsStyling/computeScreen.css';
+import { satInterventionCalculations } from '../voiceLeadingFunctions/satInterventionCalculations';
+import { convertToXML } from '../xml/xmlComputation';
 
 function ComputeScreen() {
   const osmdContainerRef = useRef(null);
   const osmdInstanceRef = useRef(null);
   const location = useLocation();
-  const { openSpacingXml, closedSpacingXml, table } = location.state || {};
+  const { openSpacingXml, closedSpacingXml, table, xmlInput } = location.state || {};
 
   const [currentXml, setCurrentXml] = useState(openSpacingXml);
   const [isClosedSpacingAvailable, setIsClosedSpacingAvailable] = useState(!!closedSpacingXml);
+  const [currentDegrees, setCurrentDegrees] = useState(xmlInput.openDegrees);
 
   // Initialize additional opportunity arrays if not present
   const methodOpportunities = table.methodOpportunities || Array(table.chords.length - 1).fill(false);
   const forkingOpportunities = table.forkingOpportunities || Array(table.chords.length - 1).fill(false);
-  const satInterventionOpportunities = table.satInterventionOpportunities || Array(table.chords.length - 1).fill([false, false]);
-  const bassInterventionOpportunities = table.bassInterventionOpportunities || Array(table.chords.length - 1).fill([false, false]);
+  
+  const [satInterventionOpportunities, setSatInterventionOpportunities] = useState(
+    satInterventionAvailability(table.chords, currentDegrees)
+  );
+  const [bassInterventionOpportunities, setBassInterventionOpportunities] = useState(
+    bassInterventionAvailability(table.chords, currentDegrees)
+  );
 
-  satInterventionOpportunities[1] = [true, false];
-  bassInterventionOpportunities[0] = [true, true];
+  console.log(satInterventionOpportunities);
+  console.log(bassInterventionOpportunities);
+
+  const updateCurrentDegrees = (row, index, type) => {
+    setCurrentDegrees(prevDegrees => {
+      let newDegrees = JSON.parse(JSON.stringify(prevDegrees)); // Create a deep copy
+      if (row === 'SAT Intervention') {
+        newDegrees = satInterventionCalculations(newDegrees, type, index);
+      } else if (row === 'Bass Intervention') {
+        for (let i = index; i < newDegrees.length; i++) {
+          if (type === 'up') {
+            newDegrees[i][3] += 7;
+          } else {
+            newDegrees[i][3] -= 7;
+          }
+        }
+      }
+
+      // Update intervention opportunities
+      setSatInterventionOpportunities(satInterventionAvailability(table.chords, newDegrees));
+      setBassInterventionOpportunities(bassInterventionAvailability(table.chords, newDegrees));
+      
+      let newXml = convertToXML(newDegrees, table.chords, xmlInput.key, xmlInput.durations);
+      setCurrentXml(newXml);
+      return newDegrees;
+    });
+  };
+
+  const handleArrowClick = (row, index, type) => {
+    console.log(`Arrow clicked in row: ${row}, index: ${index}, type: ${type}`);
+    updateCurrentDegrees(row, index, type);
+  };
 
   useEffect(() => {
     const loadAndRenderOSMD = async () => {
@@ -84,7 +123,7 @@ function ComputeScreen() {
       >
         {currentXml === openSpacingXml ? "Closed Spacing" : "Open Spacing"}
       </button>
-      {table && (
+      {table && table.chords.length > 1 && (
         <div className="info-container">
           {/* First Table: Doubling Decisions */}
           <table className="decision-table">
@@ -141,11 +180,23 @@ function ComputeScreen() {
                 <td>SAT Intervention</td>
                 {satInterventionOpportunities.map((opportunity, index) => (
                   <td key={`sat-${index}`} className="decision-cell">
-                    {opportunity[0] && (
-                      <ArrowButton type="up" row="SAT Intervention" index={index} isEnabled={opportunity[0]} />
-                    )}
-                    {opportunity[1] && (
-                      <ArrowButton type="down" row="SAT Intervention" index={index} isEnabled={opportunity[1]} />
+                    {(opportunity[0] || opportunity[1]) && (
+                      <>
+                        <ArrowButton
+                          type="up"
+                          row="SAT Intervention"
+                          index={index}
+                          isEnabled={opportunity[0]}
+                          onClick={handleArrowClick}
+                        />
+                        <ArrowButton
+                          type="down"
+                          row="SAT Intervention"
+                          index={index}
+                          isEnabled={opportunity[1]}
+                          onClick={handleArrowClick}
+                        />
+                      </>
                     )}
                     {!opportunity[0] && !opportunity[1] && (
                       <div className="arrow-placeholder"></div>
@@ -157,11 +208,23 @@ function ComputeScreen() {
                 <td>Bass Intervention</td>
                 {bassInterventionOpportunities.map((opportunity, index) => (
                   <td key={`bass-${index}`} className="decision-cell">
-                    {opportunity[0] && (
-                      <ArrowButton type="up" row="Bass Intervention" index={index} isEnabled={opportunity[0]} />
-                    )}
-                    {opportunity[1] && (
-                      <ArrowButton type="down" row="Bass Intervention" index={index} isEnabled={opportunity[1]} />
+                    {(opportunity[0] || opportunity[1]) && (
+                      <>
+                        <ArrowButton
+                          type="up"
+                          row="Bass Intervention"
+                          index={index}
+                          isEnabled={opportunity[0]}
+                          onClick={handleArrowClick}
+                        />
+                        <ArrowButton
+                          type="down"
+                          row="Bass Intervention"
+                          index={index}
+                          isEnabled={opportunity[1]}
+                          onClick={handleArrowClick}
+                        />
+                      </>
                     )}
                     {!opportunity[0] && !opportunity[1] && (
                       <div className="arrow-placeholder"></div>

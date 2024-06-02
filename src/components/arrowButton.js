@@ -1,24 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import '../componentsStyling/arrowButton.css';
 
-const ArrowButton = ({ type, row, index, isEnabled }) => {
-  const [isClicked, setIsClicked] = useState(false);
-
+const ArrowButton = ({ type, row, index, isEnabled, onClick }) => {
   const handleClick = () => {
     if (isEnabled) {
-      setIsClicked(true);
       console.log(`${type} button clicked in row ${row}, index ${index}`);
+      onClick(row, index, type);
     }
   };
 
   return (
     <button
       onClick={handleClick}
-      className={`arrow-button ${isClicked ? 'clicked' : ''}`}
-      style={{
-        backgroundColor: isClicked ? 'red' : (isEnabled ? '#007bff' : '#cccccc'),
-        cursor: isEnabled ? 'pointer' : 'not-allowed',
-      }}
+      className={`arrow-button ${!isEnabled ? 'disabled' : ''}`}
     >
       {type === 'up' ? '↑' : '↓'}
     </button>

@@ -121,7 +121,15 @@ function SelectionScreen() {
         doublingOpportunities: doublingOpportunities
       };
 
-      navigate('/compute', { state: { openSpacingXml, closedSpacingXml, table} });
+      let xmlInput = {
+        openDegrees: formattedNotes, 
+        closedDegrees: closedSpacingNotes,
+        chordSequence: chordSequence, 
+        key: selectedKey, 
+        durations: durationValues
+      }
+
+      navigate('/compute', { state: { openSpacingXml, closedSpacingXml, table, xmlInput} });
     }
   };
 

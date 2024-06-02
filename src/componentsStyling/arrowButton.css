@@ -9,10 +9,6 @@
   transition: background-color 0.3s ease;
 }
 
-.arrow-button.clicked {
-  background-color: red;
-}
-
 .arrow-button.disabled {
   background-color: #cccccc;
   cursor: not-allowed;
