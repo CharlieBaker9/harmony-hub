@@ -12,7 +12,7 @@ function satInterventionCalculations(degrees, direction, index) {
     // Find the first multiple of 7 greater than or equal to maxSTDifference
     const tenorAdjustment = Math.ceil(maxSTDifference / 7) * 7;
 
-    for (let i = index; i < newDegrees.length; i++) {
+    for (let i = index+1; i < newDegrees.length; i++) {
       const oldDegree0 = newDegrees[i][0];
       const oldDegree1 = newDegrees[i][1];
 
@@ -26,7 +26,7 @@ function satInterventionCalculations(degrees, direction, index) {
     // Find the first multiple of 7 greater than or equal to maxSTDifference
     const sopranoAdjustment = -Math.ceil(maxSTDifference / 7) * 7;
 
-    for (let i = index; i < newDegrees.length; i++) {
+    for (let i = index+1; i < newDegrees.length; i++) {
       const oldDegree1 = newDegrees[i][1];
       const oldDegree2 = newDegrees[i][2];
 

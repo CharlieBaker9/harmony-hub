@@ -37,8 +37,6 @@ function createChordProgressions(initialVoicing, progression) {
   const changes = generateChanges(initialVoicing, progression);
   const scenario1 = initialVoicing.map((voice, i) => voice + (changes[i][0]));
   const scenario2 = initialVoicing.map((voice, i) => voice + (changes[i][1]));
-  console.log(scenario1);
-  console.log(scenario2);
 
   // Compare and select valid voicing scenario
   const validScenario1 = isValidVoicing(scenario1);
@@ -58,12 +56,12 @@ function createChordProgressions(initialVoicing, progression) {
 }
 
 // Define the initial voicing and the progression dictionary
-const initialVoicing = [8, 1, -2];
-const progression = {
-  "8": [8, 11], // '8' stays '8', or goes to '11'
-  "1": [3, 1], // '1' goes to '1', or '3'
-  "-2": [-2]      // '3' stays '3'
-};
+// const initialVoicing = [8, 1, -2];
+// const progression = {
+//   "8": [8, 11], // '8' stays '8', or goes to '11'
+//   "1": [3, 1], // '1' goes to '1', or '3'
+//   "-2": [-2]      // '3' stays '3'
+// };
 
-const bestProgression = createChordProgressions(initialVoicing, progression);
-console.log(bestProgression);
+// const bestProgression = createChordProgressions(initialVoicing, progression);
+// console.log(bestProgression);

@@ -36,17 +36,13 @@ function generateOriginList(notes) {
 function matchingDoubling(path, s, a, t){
   // determing method opportunity -- checking to see if the doubling is the same
   let tempPaths = []
-  console.log("sat: ", s, a, t);
   const sortedOriginChord = generateOriginList([s, a, t]);
 
   for (let j=0; j < path.length; j++){
     let sortedTargetChord = generateKeyList(path[j]);
 
     if (sortedTargetChord.length === sortedOriginChord.length) {
-      console.log("in first if statement");
-      console.log("The sorted target and origin chord", sortedTargetChord, sortedOriginChord);
       if (sortedTargetChord.every((value, index) => value === sortedOriginChord[index])){
-        console.log("in second if statement");
         tempPaths.push(path[j]);
       }
     }

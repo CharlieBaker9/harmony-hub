@@ -6,6 +6,7 @@ import { bassInterventionAvailability, satInterventionAvailability } from '../vo
 import '../componentsStyling/computeScreen.css';
 import { satInterventionCalculations } from '../voiceLeadingFunctions/satInterventionCalculations';
 import { convertToXML } from '../xml/xmlComputation';
+import { forkingChange } from '../voiceLeadingFunctions/forkingChange.js';
 
 function ComputeScreen() {
   const osmdContainerRef = useRef(null);
@@ -30,28 +31,45 @@ function ComputeScreen() {
 
   const [activeDoublingDecisions, setActiveDoublingDecisions] = useState(table.doublingDecisions || {});
   const [activeMethodButtons, setActiveMethodButtons] = useState({});
+  const [activeForkingButtons, setActiveForkingButtons] = useState({});
 
-  // console.log("doublingOpportunities, activeDoublingDecisions in compute: ", doublingOpportunities, activeDoublingDecisions);
-
-  const updateCurrentDegrees = (row, index, type) => {
+  const updateCurrentDegrees = (row, index, type, opportunity = null) => {
     setCurrentDegrees(prevDegrees => {
       let newDegrees = JSON.parse(JSON.stringify(prevDegrees)); // Create a deep copy
       if (row === 'SAT Intervention') {
         newDegrees = satInterventionCalculations(newDegrees, type, index);
       } else if (row === 'Bass Intervention') {
-        for (let i = index; i < newDegrees.length; i++) {
+        for (let i = index + 1; i < newDegrees.length; i++) {
           if (type === 'up') {
             newDegrees[i][3] += 7;
           } else {
             newDegrees[i][3] -= 7;
           }
         }
+      } else if (row === 'Doubling') {
+        setActiveDoublingDecisions(prevState => ({
+          ...prevState,
+          [index]: opportunity
+        }));
+      } else if (row === 'Method') {
+        setActiveMethodButtons(prevState => ({
+          ...prevState,
+          [index]: opportunity
+        }));
+      } else if (row === 'Forking') {
+        newDegrees = forkingChange(currentDegrees, index);
+        console.log(newDegrees);
+
+        setActiveForkingButtons(prevState => ({
+          ...prevState,
+          [index]: prevState[index] === opportunity ? null : opportunity // Toggle the active state
+        }));
       }
 
       // Update intervention opportunities
       setSatInterventionOpportunities(satInterventionAvailability(table.chords, newDegrees));
       setBassInterventionOpportunities(bassInterventionAvailability(table.chords, newDegrees));
-      
+
       let newXml = convertToXML(newDegrees, table.chords, xmlInput.key, xmlInput.durations);
       setCurrentXml(newXml);
       return newDegrees;
@@ -64,18 +82,8 @@ function ComputeScreen() {
   };
 
   const handleOpportunityClick = (index, type, opportunity) => {
-    if (type === "Doubling") {
-      setActiveDoublingDecisions(prevState => ({
-        ...prevState,
-        [index]: opportunity
-      }));
-    } else if (type === "Method") {
-      setActiveMethodButtons(prevState => ({
-        ...prevState,
-        [index]: opportunity
-      }));
-    }
-    console.log(`Clicked ${type} button at index ${index} with opportunity ${opportunity}`);
+    console.log(`Opportunity clicked: type: ${type}, index: ${index}, opportunity: ${opportunity}`);
+    updateCurrentDegrees(type, index, type, opportunity);
   };
 
   useEffect(() => {
@@ -212,14 +220,16 @@ function ComputeScreen() {
                 <td>Forking</td>
                 {forkingOpportunities.map((opportunity, index) => (
                   <td key={`forking-${index}`}>
-                    <DecisionButton
-                      text="Forking Text" // Example text
-                      opportunity={opportunity} // Opportunity for click handling
-                      type="Forking"
-                      isActive={false} // Add state management if needed
-                      index={index}
-                      onClick={handleOpportunityClick}
-                    />
+                    {opportunity !== false && (
+                      <DecisionButton
+                        text="Forking"
+                        opportunity={opportunity} // Opportunity for click handling
+                        type="Forking"
+                        isActive={activeForkingButtons[index] === opportunity} // Check if the button is active
+                        index={index}
+                        onClick={handleOpportunityClick}
+                      />
+                    )}
                   </td>
                 ))}
               </tr>

@@ -85,12 +85,11 @@ function SelectionScreen() {
       let methodOpportunities = Array(chordProgression.length - 1).fill(false);
       let doublingDecisions = Array(chordProgression.length).fill(false);
       let doublingOpportunities = Array(chordProgression.length).fill(false);
-      let forkingDecisions = Array(chordProgression.length - 1).fill(false);
       let forkingOpportunities = Array(chordProgression.length - 1).fill(false);
 
 
-      [soprano, alto, tenor, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities, forkingDecisions, forkingOpportunities] = generateSAT(chordProgression, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities, forkingDecisions, forkingOpportunities);
-
+      [soprano, alto, tenor, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities, forkingOpportunities] = generateSAT(chordProgression, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities, forkingOpportunities);
+      
       const bass = shiftBassNotes(tenor, bassNotes);
 
       let formattedNotes = [];
@@ -121,7 +120,8 @@ function SelectionScreen() {
         methodDecisions: methodDecisions,
         methodOpportunities: methodOpportunities,
         doublingDecisions: doublingDecisions,
-        doublingOpportunities: doublingOpportunities
+        doublingOpportunities: doublingOpportunities,
+        forkingOpportunities: forkingOpportunities
       };
 
       let xmlInput = {

@@ -1,13 +1,13 @@
 import doublingChoice from './doublingChoice.js';
 import { findDoublings } from './findDoublings.js';
-import { matchingDoubling } from './matchingDoubling.js';
 const spacingDict = require('../dictionaries/openSpacing.json');
 const progressionDict = require('../dictionaries/combinedProgression.json');
 const doublingDictionary = require('../dictionaries/doublingDictionary.json');
 const chordRootNoteDictionary = require('../dictionaries/chordRootNote.json');
 
-function addingNote(method, satArray, forkingDecisions, forkingOpportunities, idx) {
-  let returningToSameScaleDegree = false;
+function addingNote(method, satArray, forkingOpportunities, idx) {
+  let addedNotes = [];
+
   for (let i = 0; i < 3; i++){
     let currNote = satArray[i][0];
 
@@ -16,31 +16,27 @@ function addingNote(method, satArray, forkingDecisions, forkingOpportunities, id
 
     let nextNote = method[currNote];
 
-    // this is a doubling fork
+    // this is a fork
     if (Array.isArray(nextNote)){
-      const doublingPolarityBool = forkingDecisions[forkingDecisions.length - satArray[i].length];
-      if (!returningToSameScaleDegree){
-        nextNote = nextNote[doublingPolarityBool ? 0 : 1]
-        returningToSameScaleDegree = true;
+      if (addedNotes.includes(nextNote[0])){
+        nextNote = nextNote[1];
       } else {
-        nextNote = nextNote[doublingPolarityBool ? 1 : 0]
+        nextNote = nextNote[0];
+        addedNotes.push(nextNote);
       }
     }
     satArray[i].unshift(nextNote);
   }
-  if (returningToSameScaleDegree){
-    forkingOpportunities[idx] = true;
+  if (addedNotes.length === 2){
     const newSatArray = satArray.map(subArray => [...subArray]);
     const regisSat = assigningToRegister(newSatArray[0], newSatArray[1], newSatArray[2]);
 
-    const { correctVoicing, changed } = doublingChoice(satArray[0].slice(0,2), satArray[1].slice(0,2), satArray[2].slice(0,2), regisSat[0][1], regisSat[1][1], regisSat[2][1]);
+    let { correctVoicing } = doublingChoice(satArray[0].slice(0,2), satArray[1].slice(0,2), satArray[2].slice(0,2), regisSat[0][1], regisSat[1][1], regisSat[2][1]);
     for (let i = 0; i < 3; i++){
       satArray[i][0] = correctVoicing[i];
     }
-    if (changed) {
-      let index = forkingDecisions.length - satArray[0].length;
-      forkingDecisions[index] = forkingDecisions[index] === 1 ? 0 : 1;
-    }
+
+    forkingOpportunities[idx] = method;
   }
 }
 
@@ -76,7 +72,7 @@ function assigningToRegister(s, a, t) {
   return [soprano, alto, tenor];
 }
 
-function generateSAT(progression, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities, forkingDecisions, forkingOpportunities) {
+function generateSAT(progression, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities, forkingOpportunities) {
   let s = [];
   let a = [];
   let t = [];
@@ -121,10 +117,10 @@ function generateSAT(progression, methodDecisions, methodOpportunities, doubling
     } 
     let method = path[methodDecisions[i-1]]; 
 
-    addingNote(method, [s, a, t], forkingDecisions, forkingOpportunities, i-1);
+    addingNote(method, [s, a, t], forkingOpportunities, i-1);
   }
   let parts = assigningToRegister(s, a, t);
-  parts.push(methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities);
+  parts.push(methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities, forkingOpportunities);
 
   return parts;
 }

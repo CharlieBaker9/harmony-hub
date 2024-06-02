@@ -1,17 +1,15 @@
 import React from 'react';
 import '../componentsStyling/decisionButton.css';
 
-const DecisionButton = ({ text, opportunity, type, isActive, onClick, index }) => {
-  const handleClick = () => {
-    onClick(index, type, opportunity);
-  };
+const DecisionButton = ({ text, type, index, onClick, isActive }) => {
+  const buttonClass = isActive ? 'decision-button active' : 'decision-button';
 
   return (
     <button
-      className={`decision-button ${isActive ? 'active' : ''}`}
-      onClick={handleClick}
+      className={buttonClass}
+      onClick={() => onClick(index, type, text)}
     >
-      {text || opportunity}
+      {text}
     </button>
   );
 };
