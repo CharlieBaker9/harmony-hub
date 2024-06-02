@@ -1,9 +1,12 @@
 import doublingChoice from './doublingChoice.js';
+import { findDoublings } from './findDoublings.js';
 import { matchingDoubling } from './matchingDoubling.js';
 const spacingDict = require('../dictionaries/openSpacing.json');
-const progressionDict = require('../dictionaries/progressionDict.json');
+const progressionDict = require('../dictionaries/combinedProgression.json');
+const doublingDictionary = require('../dictionaries/doublingDictionary.json');
+const chordRootNoteDictionary = require('../dictionaries/chordRootNote.json');
 
-function addingNote(method, satArray, doublingDecisions, doublingOpportunities, idx) {
+function addingNote(method, satArray, forkingDecisions, forkingOpportunities, idx) {
   let returningToSameScaleDegree = false;
   for (let i = 0; i < 3; i++){
     let currNote = satArray[i][0];
@@ -15,7 +18,7 @@ function addingNote(method, satArray, doublingDecisions, doublingOpportunities, 
 
     // this is a doubling fork
     if (Array.isArray(nextNote)){
-      const doublingPolarityBool = doublingDecisions[doublingDecisions.length - satArray[i].length];
+      const doublingPolarityBool = forkingDecisions[forkingDecisions.length - satArray[i].length];
       if (!returningToSameScaleDegree){
         nextNote = nextNote[doublingPolarityBool ? 0 : 1]
         returningToSameScaleDegree = true;
@@ -26,7 +29,7 @@ function addingNote(method, satArray, doublingDecisions, doublingOpportunities, 
     satArray[i].unshift(nextNote);
   }
   if (returningToSameScaleDegree){
-    doublingOpportunities[idx] = true;
+    forkingOpportunities[idx] = true;
     const newSatArray = satArray.map(subArray => [...subArray]);
     const regisSat = assigningToRegister(newSatArray[0], newSatArray[1], newSatArray[2]);
 
@@ -35,8 +38,8 @@ function addingNote(method, satArray, doublingDecisions, doublingOpportunities, 
       satArray[i][0] = correctVoicing[i];
     }
     if (changed) {
-      let index = doublingDecisions.length - satArray[0].length;
-      doublingDecisions[index] = doublingDecisions[index] === 1 ? 0 : 1;
+      let index = forkingDecisions.length - satArray[0].length;
+      forkingDecisions[index] = forkingDecisions[index] === 1 ? 0 : 1;
     }
   }
 }
@@ -73,7 +76,7 @@ function assigningToRegister(s, a, t) {
   return [soprano, alto, tenor];
 }
 
-function generateSAT(progression, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities) {
+function generateSAT(progression, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities, forkingDecisions, forkingOpportunities) {
   let s = [];
   let a = [];
   let t = [];
@@ -81,9 +84,20 @@ function generateSAT(progression, methodDecisions, methodOpportunities, doubling
   let last = spacingDict[progression[progression.length-1]];
 
   // this is a doubling opportunity for the last chord
-  if (Array.isArray(last[0])) {
-    last = last[0];
-    doublingOpportunities[doublingOpportunities.length-1] = true;
+  if (Array.isArray(last[0])) {   
+    
+    let doublingChoices = {};
+
+    doublingChoices[doublingDictionary[JSON.stringify(last[0])]] = last[0];
+    doublingChoices[doublingDictionary[JSON.stringify(last[1])]] = last[1];
+
+    let lastChord = progression[progression.length-1]
+    let root = chordRootNoteDictionary[lastChord];
+    let doubledRoot = doublingChoices[root];
+
+    doublingDecisions[doublingDecisions.length-1] = root;
+    doublingOpportunities[doublingOpportunities.length-1] = doublingChoices;
+    last = doubledRoot;
   }
 
   s.push(last[0]);
@@ -95,13 +109,20 @@ function generateSAT(progression, methodDecisions, methodOpportunities, doubling
     let path = progressionDict[progressionKey];
     
     if (path.length > 1){
-      path = matchingDoubling(path, s[0], a[0], t[0]);
+      let doublingDict = findDoublings(path);
+      if (!(Object.keys(doublingDict).length === 0)){
+        let root = chordRootNoteDictionary[progression[i - 1]];
+        doublingDecisions[i-1] = root;
+        path = [doublingDict[root]];
+        doublingOpportunities[i-1] = doublingDict;
+      }
+      // path = matchingDoubling(path, s[0], a[0], t[0]);
     } 
 
     methodOpportunities[i-1] = path.length > 1;
     let method = path[methodDecisions[i-1]]; 
 
-    addingNote(method, [s, a, t], doublingDecisions, doublingOpportunities, i-1);
+    addingNote(method, [s, a, t], forkingDecisions, forkingOpportunities, i-1);
   }
   let parts = assigningToRegister(s, a, t);
   parts.push(methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities);

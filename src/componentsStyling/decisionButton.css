@@ -1,0 +1,12 @@
+.decision-button {
+  background-color: blue;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.decision-button.active {
+  background-color: red;
+}

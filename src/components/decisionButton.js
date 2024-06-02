@@ -1,30 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
+import '../componentsStyling/decisionButton.css';
 
-function DecisionButton({ opportunity, type }) {
-  const [isClicked, setIsClicked] = useState(false);
-
+const DecisionButton = ({ text, opportunity, type, isActive, onClick }) => {
   const handleClick = () => {
-    setIsClicked(!isClicked);
+    onClick(opportunity);
   };
-
-  if (!opportunity) {
-    // Return a placeholder div to keep spacing consistent
-    return <div style={{ display: 'inline-block', width: '75px', height: '30px' }} />;
-  }
 
   return (
     <button
+      className={`decision-button ${isActive ? 'active' : ''}`}
       onClick={handleClick}
-      style={{
-        width: '75px',
-        height: '30px',
-        backgroundColor: isClicked ? 'red' : 'initial',
-        margin: '5px',
-      }}
     >
-      {type}
+      {text || opportunity}
     </button>
   );
-}
+};
 
 export default DecisionButton;

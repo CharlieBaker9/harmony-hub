@@ -17,10 +17,10 @@ function ComputeScreen() {
   const [isClosedSpacingAvailable, setIsClosedSpacingAvailable] = useState(!!closedSpacingXml);
   const [currentDegrees, setCurrentDegrees] = useState(xmlInput.openDegrees);
 
-  // Initialize additional opportunity arrays if not present
+  const doublingOpportunities = table.doublingOpportunities;
   const methodOpportunities = table.methodOpportunities || Array(table.chords.length - 1).fill(false);
   const forkingOpportunities = table.forkingOpportunities || Array(table.chords.length - 1).fill(false);
-  
+
   const [satInterventionOpportunities, setSatInterventionOpportunities] = useState(
     satInterventionAvailability(table.chords, currentDegrees)
   );
@@ -28,8 +28,9 @@ function ComputeScreen() {
     bassInterventionAvailability(table.chords, currentDegrees)
   );
 
-  console.log(satInterventionOpportunities);
-  console.log(bassInterventionOpportunities);
+  const [activeDoublingDecisions, setActiveDoublingDecisions] = useState(table.doublingDecisions || {});
+
+  console.log("doublingOpportunities, activeDoublingDecisions in compute: ", doublingOpportunities, activeDoublingDecisions);
 
   const updateCurrentDegrees = (row, index, type) => {
     setCurrentDegrees(prevDegrees => {
@@ -59,6 +60,13 @@ function ComputeScreen() {
   const handleArrowClick = (row, index, type) => {
     console.log(`Arrow clicked in row: ${row}, index: ${index}, type: ${type}`);
     updateCurrentDegrees(row, index, type);
+  };
+
+  const handleOpportunityClick = (index, opportunity) => {
+    setActiveDoublingDecisions(prevState => ({
+      ...prevState,
+      [index]: opportunity
+    }));
   };
 
   useEffect(() => {
@@ -138,9 +146,22 @@ function ComputeScreen() {
             <tbody>
               <tr>
                 <td>Doubling</td>
-                {table.doublingOpportunities.map((opportunity, index) => (
+                {doublingOpportunities.map((opportunity, index) => (
                   <td key={`doubling-${index}`}>
-                    <DecisionButton opportunity={opportunity} type="Doubling" />
+                    {opportunity && typeof opportunity === 'object' ? (
+                      Object.keys(opportunity).map((key, keyIndex) => (
+                        <DecisionButton
+                          key={`doubling-${index}-${keyIndex}`}
+                          text={key} // Pass text to be displayed
+                          opportunity={key} // Opportunity for click handling
+                          type="Doubling"
+                          isActive={activeDoublingDecisions[index] === key}
+                          onClick={() => handleOpportunityClick(index, key)}
+                        />
+                      ))
+                    ) : (
+                      <span></span>
+                    )}
                   </td>
                 ))}
               </tr>
@@ -164,7 +185,13 @@ function ComputeScreen() {
                 <td>Method</td>
                 {methodOpportunities.map((opportunity, index) => (
                   <td key={`method-${index}`}>
-                    <DecisionButton opportunity={opportunity} type="Method" />
+                    <DecisionButton
+                      text="Method Text" // Example text
+                      opportunity={opportunity} // Opportunity for click handling
+                      type="Method"
+                      isActive={false} // Add state management if needed
+                      onClick={() => console.log('Method Clicked')}
+                    />
                   </td>
                 ))}
               </tr>
@@ -172,7 +199,13 @@ function ComputeScreen() {
                 <td>Forking</td>
                 {forkingOpportunities.map((opportunity, index) => (
                   <td key={`forking-${index}`}>
-                    <DecisionButton opportunity={opportunity} type="Forking" />
+                    <DecisionButton
+                      text="Forking Text" // Example text
+                      opportunity={opportunity} // Opportunity for click handling
+                      type="Forking"
+                      isActive={false} // Add state management if needed
+                      onClick={() => console.log('Forking Clicked')}
+                    />
                   </td>
                 ))}
               </tr>

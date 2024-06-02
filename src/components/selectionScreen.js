@@ -81,12 +81,15 @@ function SelectionScreen() {
       const bassNotes = obtainBassNotes(chordSequence);
       const chordProgression = chordSequence.split(' ');
       let soprano, alto, tenor;
-      let methodDecisions = Array(chordProgression.length).fill(0);
-      let methodOpportunities = Array(chordProgression.length).fill(false);
-      let doublingDecisions = Array(chordProgression.length - 1).fill(false);
-      let doublingOpportunities = Array(chordProgression.length - 1).fill(false);
+      let methodDecisions = Array(chordProgression.length - 1).fill(0);
+      let methodOpportunities = Array(chordProgression.length - 1).fill(false);
+      let doublingDecisions = Array(chordProgression.length).fill(false);
+      let doublingOpportunities = Array(chordProgression.length).fill(false);
+      let forkingDecisions = Array(chordProgression.length - 1).fill(false);
+      let forkingOpportunities = Array(chordProgression.length - 1).fill(false);
 
-      [soprano, alto, tenor, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities] = generateSAT(chordProgression, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities);
+
+      [soprano, alto, tenor, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities, forkingDecisions, forkingOpportunities] = generateSAT(chordProgression, methodDecisions, methodOpportunities, doublingDecisions, doublingOpportunities, forkingDecisions, forkingOpportunities);
 
       const bass = shiftBassNotes(tenor, bassNotes);
 
@@ -136,7 +139,7 @@ function SelectionScreen() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Harmony Hub</h1>
+        <h1>Forking Decisions</h1>
         <div className="controls-container">
           <label htmlFor="keyDropdown">Select Key</label>
           <Dropdown
